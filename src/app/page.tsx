@@ -28,7 +28,7 @@ export default function Home() {
                   Arizona Cricket Club
                 </h1>
                 <h2 className="text-sm uppercase tracking-wide text-gray-300 mt-1">
-                  HOME OF VIPERS & RATTLERS
+                  HOME OF VIPERS, RATTLERS, BLACK MAMBAS & COBRAS
                 </h2>
               </div>
             </div>
@@ -46,8 +46,8 @@ export default function Home() {
                 <a href="/admin/login" className="text-white hover:text-yellow-400 font-medium text-sm uppercase tracking-wide">ADMIN</a>
               </nav>
               <a href="/join" className="bg-yellow-400 text-black px-6 py-2 rounded-md text-sm font-bold uppercase tracking-wide hover:bg-yellow-500 transition-colors">
-  JOIN ACC
-</a>
+                JOIN ACC
+              </a>
             </div>
 
             {/* Mobile Menu Button */}
@@ -79,27 +79,21 @@ export default function Home() {
               <a href="#" className="text-white hover:text-yellow-400 font-medium text-sm uppercase tracking-wide py-2">VIDEO ARCHIVES</a>
               <a href="/admin/login" className="text-white hover:text-yellow-400 font-medium text-sm py-2">ADMIN CONSOLE</a>
               <a href="/join" className="bg-yellow-400 text-black px-6 py-2 rounded-md text-sm font-bold uppercase tracking-wide hover:bg-yellow-500 transition-colors w-fit mt-2">
-  JOIN ACC
-</a>
+                JOIN ACC
+              </a>
             </nav>
           </div>
         </div>
       )}
 
-      {/* Hero Image Section - Robust Solution */}
+      {/* Hero Image Section - Using Next.js Image */}
       <div className="relative w-full" style={{height: '320px'}}>
-        <img 
-          src="/test.jpg" 
+        <Image
+          src="/test.jpg"
           alt="Arizona Cricket Club Cricket Ground"
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            zIndex: 1
-          }}
+          fill
+          className="object-cover"
+          priority
         />
         <div 
           style={{
@@ -118,7 +112,7 @@ export default function Home() {
           <div className="text-center text-white">
             <h2 className="text-5xl font-bold mb-4">Arizona Cricket Club</h2>
             <p className="text-xl mb-2">Established 2003</p>
-            <p className="text-lg">Home of Vipers & Rattlers</p>
+            <p className="text-lg">Home of Vipers, Rattlers, Black Mambas & Cobras</p>
           </div>
         </div>
       </div>
@@ -128,12 +122,12 @@ export default function Home() {
         {/* Welcome Section */}
         <div className="mb-12">
           <h2 className="text-4xl font-bold text-gray-900 mb-6 text-center">
-            WELCOME TO THE ARIZONA CRICKET CLUB'S WEBSITE
+            WELCOME TO THE ARIZONA CRICKET CLUB&apos;S WEBSITE
           </h2>
           <div className="prose max-w-none text-gray-700 leading-relaxed text-lg">
             <p className="mb-6">
               The club was created in August 2003 to promote the game of Cricket in Arizona as the way the sport was meant to be played. 
-              We are the only team in Arizona who has their own ground and play on natural turf wicket.
+              We are the only team in Arizona who has our own ground and play on natural turf wicket.
             </p>
             <p className="mb-6">
               We play with the spirit of good sportsmanship, camaraderie, hospitality, and treat all visiting teams like guests in our home. 
@@ -202,7 +196,7 @@ export default function Home() {
             <div>
               <h4 className="text-xl font-semibold text-gray-900 mb-4">FROM SKY HARBOR AIRPORT</h4>
               <p className="text-gray-700 text-sm">
-                Take 202 East go approximately 4 miles to 101 South. Go another approximate 4 miles to 60 East. You will go approximately 8 miles and exit on Higley, turn right go approximately 2 miles. Look for a sign for Nichols Park on the right just as you pass the Walgreen's on the SW corner of Higley and Guadalupe. Turn into the gravel drive way and go to the east end of the lot and park facing large mound of dirt and follow the path down to the grounds. (Note: Ground is not visible from Street level)
+                Take 202 East go approximately 4 miles to 101 South. Go another approximate 4 miles to 60 East. You will go approximately 8 miles and exit on Higley, turn right go approximately 2 miles. Look for a sign for Nichols Park on the right just as you pass the Walgreen&apos;s on the SW corner of Higley and Guadalupe. Turn into the gravel drive way and go to the east end of the lot and park facing large mound of dirt and follow the path down to the grounds. (Note: Ground is not visible from Street level)
               </p>
             </div>
             <div>
@@ -252,6 +246,7 @@ export default function Home() {
           <div className="flex justify-center space-x-6">
             <a href="#" className="text-gray-400 hover:text-white">Facebook</a>
             <a href="#" className="text-gray-400 hover:text-white">Twitter</a>
+            <a href="#" className="text-gray-400 hover:text-white">Flickr</a>
           </div>
         </div>
       </footer>
