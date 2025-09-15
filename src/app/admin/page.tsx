@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 export default function AdminConsole() {
   return (
     <div className="min-h-screen bg-gray-50">
@@ -8,7 +10,7 @@ export default function AdminConsole() {
             <div className="flex items-center">
               <h1 className="text-3xl font-bold text-green-800">Admin Console</h1>
             </div>
-            <a href="/" className="text-gray-600 hover:text-green-600">← Back to Home</a>
+            <Link href="/" className="text-gray-600 hover:text-green-600">← Back to Home</Link>
           </div>
         </div>
       </header>
@@ -33,18 +35,18 @@ export default function AdminConsole() {
               <h3 className="text-2xl font-bold text-gray-900 mb-4">Authoring Content</h3>
               <p className="text-gray-600 mb-6">Manage homepage content, sponsors, team information, and announcements</p>
               <div className="space-y-2">
-                <a href="/admin/content/homepage" className="block w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">
+                <Link href="/admin/content/homepage" className="block w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">
                   Homepage Content
-                </a>
-                <a href="/admin/content/sponsors" className="block w-full bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors">
+                </Link>
+                <Link href="/admin/content/sponsors" className="block w-full bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors">
                   Sponsor Management
-                </a>
-                <a href="/admin/content/teams" className="block w-full bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors">
+                </Link>
+                <Link href="/admin/content/teams" className="block w-full bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors">
                   Team Information
-                </a>
-                <a href="/admin/content/news" className="block w-full bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors">
+                </Link>
+                <Link href="/admin/content/news" className="block w-full bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors">
                   News & Announcements
-                </a>
+                </Link>
               </div>
             </div>
           </div>
@@ -60,18 +62,18 @@ export default function AdminConsole() {
               <h3 className="text-2xl font-bold text-gray-900 mb-4">Expense Report Creation</h3>
               <p className="text-gray-600 mb-6">Create and manage expense reports by year, category, and format</p>
               <div className="space-y-2">
-                <a href="/admin/expenses/yearly-dues" className="block w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                <Link href="/admin/expenses/yearly-dues" className="block w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
                   Yearly Dues
-                </a>
-                <a href="/admin/expenses/categories" className="block w-full bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors">
+                </Link>
+                <Link href="/admin/expenses/categories" className="block w-full bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors">
                   Expense Categories
-                </a>
-                <a href="/admin/expenses/reports" className="block w-full bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors">
+                </Link>
+                <Link href="/admin/expenses/reports" className="block w-full bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors">
                   Report Formats
-                </a>
-                <a href="/admin/expenses/payments" className="block w-full bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors">
+                </Link>
+                <Link href="/admin/expenses/payments" className="block w-full bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors">
                   Payment Tracking
-                </a>
+                </Link>
               </div>
             </div>
           </div>
@@ -87,18 +89,18 @@ export default function AdminConsole() {
               <h3 className="text-2xl font-bold text-gray-900 mb-4">Schedule Management</h3>
               <p className="text-gray-600 mb-6">Manage game schedules, availability tracking, and venue management</p>
               <div className="space-y-2">
-                <a href="/admin/schedule/games" className="block w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors">
+                <Link href="/admin/schedule/games" className="block w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors">
                   Game Scheduling
-                </a>
-                <a href="/admin/schedule/availability" className="block w-full bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors">
+                </Link>
+                <Link href="/admin/schedule/availability" className="block w-full bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors">
                   Availability Tracking
-                </a>
-                <a href="/admin/schedule/venues" className="block w-full bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors">
+                </Link>
+                <Link href="/admin/schedule/venues" className="block w-full bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors">
                   Venue Management
-                </a>
-                <a href="/admin/schedule/calendar" className="block w-full bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors">
+                </Link>
+                <Link href="/admin/schedule/calendar" className="block w-full bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors">
                   Calendar View
-                </a>
+                </Link>
               </div>
             </div>
           </div>
