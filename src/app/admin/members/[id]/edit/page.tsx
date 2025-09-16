@@ -1,7 +1,7 @@
 'use client'
 
 import { useSession } from 'next-auth/react'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import AdminGuard from '@/components/AdminGuard'
@@ -39,7 +39,7 @@ export default function EditMemberPage() {
   useEffect(() => {
     if (!memberId) return
     Promise.all([loadTeams(), loadMember()]).finally(() => setLoading(false))
-  }, [memberId])
+  }, [memberId, loadMember])
 
   const loadTeams = async () => {
     const res = await fetch('/api/teams', { cache: 'no-store' })
@@ -48,7 +48,7 @@ export default function EditMemberPage() {
     setTeams(json.teams || [])
   }
 
-  const loadMember = async () => {
+  const loadMember = useCallback(async () => {
     const res = await fetch(`/api/members/${memberId}`, { cache: 'no-store' })
     if (!res.ok) return
     const json = await res.json()
@@ -63,7 +63,7 @@ export default function EditMemberPage() {
       date_of_birth: m.date_of_birth ? String(m.date_of_birth).slice(0, 10) : '',
       gender: m.gender || ''
     })
-  }
+  }, [memberId])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target

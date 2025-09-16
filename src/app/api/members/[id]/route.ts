@@ -3,8 +3,8 @@ import { supabaseAdmin } from '@/lib/supabase'
 import { getUserEmailFromRequest } from '@/lib/auth-utils'
 
 // GET /api/members/:id -> get single member
-export async function GET(_: NextRequest, { params }: { params: { id: string } }) {
-  const id = params.id
+export async function GET(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
   const { data, error } = await supabaseAdmin
     .from('members')
     .select('*, teams:team_id(name)')
@@ -17,9 +17,9 @@ export async function GET(_: NextRequest, { params }: { params: { id: string } }
 }
 
 // PUT /api/members/:id -> update member
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const id = params.id
+    const { id } = await params
     const body = await req.json()
     const userEmail = await getUserEmailFromRequest(req)
 
@@ -49,8 +49,8 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 }
 
 // DELETE /api/members/:id -> delete member
-export async function DELETE(_: NextRequest, { params }: { params: { id: string } }) {
-  const id = params.id
+export async function DELETE(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
   const { error } = await supabaseAdmin
     .from('members')
     .delete()
