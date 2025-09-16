@@ -103,9 +103,10 @@ export default function NewMemberPage() {
       }
 
       router.push('/admin/members')
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error creating member:', error)
-      alert('Error creating member: ' + (error.message || 'Unknown error'))
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+      alert('Error creating member: ' + errorMessage)
     } finally {
       setLoading(false)
     }
@@ -139,7 +140,7 @@ export default function NewMemberPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h1>
-          <p className="text-gray-600 mb-4">You don't have permission to create members.</p>
+          <p className="text-gray-600 mb-4">You don&apos;t have permission to create members.</p>
           <Link href="/admin/members" className="text-indigo-600 hover:text-indigo-500">
             ← Back to Members
           </Link>

@@ -100,8 +100,8 @@ export default function EditMemberPage() {
       if (!res.ok) throw new Error(json?.error || 'Failed to update member')
       setToast({ message: 'Member updated successfully', type: 'success' })
       router.push('/admin/members')
-    } catch (err: any) {
-      setToast({ message: err?.message || 'Error updating member', type: 'error' })
+    } catch (err: unknown) {
+      setToast({ message: (err as Error)?.message || 'Error updating member', type: 'error' })
     } finally {
       setSaving(false)
     }
@@ -119,7 +119,7 @@ export default function EditMemberPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h1>
-          <p className="text-gray-600 mb-4">You don't have permission to edit members.</p>
+          <p className="text-gray-600 mb-4">You don&apos;t have permission to edit members.</p>
           <Link href="/admin/members" className="text-indigo-600 hover:text-indigo-500">
             ← Back to Members
           </Link>
