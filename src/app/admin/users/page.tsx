@@ -2,12 +2,12 @@
 
 import { useAuth } from '@/hooks/useAuth'
 import { useEffect, useState } from 'react'
-import { Settings, User, Shield, Eye, Edit, Plus, X } from 'lucide-react'
+import { Settings, User, Shield, Eye, Edit } from 'lucide-react'
 import Link from 'next/link'
 
 export default function UsersPage() {
-  const { user, isLoading } = useAuth('admin')
-  const [userRoles, setUserRoles] = useState<any[]>([])
+  const { isLoading } = useAuth('admin')
+  const [userRoles, setUserRoles] = useState<Array<{ member_id: string; name: string; email: string; rbac_role: string; member_role: string }>>([])
   const [loading, setLoading] = useState(true)
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | '' }>({ message: '', type: '' })
 
@@ -18,7 +18,7 @@ export default function UsersPage() {
       if (!res.ok) throw new Error('Failed to load access assignments')
       const json = await res.json()
       setUserRoles(json.members || [])
-    } catch (e) {
+    } catch {
       setToast({ message: 'Error loading access assignments', type: 'error' })
     } finally {
       setLoading(false)
@@ -173,8 +173,9 @@ export default function UsersPage() {
                               if (!res.ok) throw new Error(json?.error || 'Failed to update access')
                               setToast({ message: 'Access updated', type: 'success' })
                               load()
-                            } catch (err: any) {
-                              setToast({ message: err?.message || 'Error updating access', type: 'error' })
+                            } catch (err: unknown) {
+                              const errorMessage = err instanceof Error ? err.message : 'Error updating access'
+                              setToast({ message: errorMessage, type: 'error' })
                             }
                           }}
                           className="border border-gray-300 rounded-md px-2 py-1 text-sm"

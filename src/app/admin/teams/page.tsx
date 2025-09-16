@@ -4,7 +4,6 @@ import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
 import { Plus, Calendar, Users } from 'lucide-react'
 import Link from 'next/link'
-import AdminGuard from '@/components/AdminGuard'
 import { getUserPermissions, UserRole } from '@/lib/permissions'
 
 interface Team {
@@ -38,7 +37,7 @@ export default function TeamsPage() {
       )
       const idToCount = new Map(counts.map(c => [c.id, c.count]))
       setTeams(teamsList.map(t => ({ ...t, member_count: idToCount.get(t.id) || 0 })))
-    } catch (e) {
+    } catch {
       setToast({ message: 'Error loading teams', type: 'error' })
     } finally {
       setLoading(false)

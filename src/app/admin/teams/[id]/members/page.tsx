@@ -1,7 +1,7 @@
 'use client'
 
 import { useSession } from 'next-auth/react'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import AdminGuard from '@/components/AdminGuard'
@@ -29,9 +29,9 @@ export default function TeamMembersPage() {
   useEffect(() => {
     if (!teamId) return
     load()
-  }, [teamId])
+  }, [teamId, load])
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true)
     try {
       const [teamRes, memRes] = await Promise.all([
@@ -40,7 +40,7 @@ export default function TeamMembersPage() {
       ])
       if (teamRes.ok) {
         const tj = await teamRes.json()
-        const found = (tj.teams || []).find((t: any) => t.id === teamId)
+        const found = (tj.teams || []).find((t: { id: string; name?: string }) => t.id === teamId)
         if (found?.name) setTeamName(found.name)
       }
       if (memRes.ok) {
@@ -50,14 +50,13 @@ export default function TeamMembersPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [teamId])
 
   if (!user) {
     return null;
   }
 
   const userRole = (user as { role?: string })?.role as UserRole || 'viewer';
-  const permissions = getUserPermissions(userRole);
 
   if (loading) {
     return (

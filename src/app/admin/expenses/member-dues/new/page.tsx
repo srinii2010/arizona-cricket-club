@@ -61,7 +61,7 @@ export default function NewMemberDuesPage() {
       } else {
         setError('Failed to fetch members');
       }
-    } catch (err) {
+    } catch {
       setError('Failed to fetch members');
     }
   };
@@ -76,7 +76,7 @@ export default function NewMemberDuesPage() {
       } else {
         setError('Failed to fetch tournament formats');
       }
-    } catch (err) {
+    } catch {
       setError('Failed to fetch tournament formats');
     }
   };
@@ -137,7 +137,7 @@ export default function NewMemberDuesPage() {
         const data = await response.json();
         setError(data.error || 'Failed to create member dues');
       }
-    } catch (err) {
+    } catch {
       setError('Failed to create member dues');
     } finally {
       setLoading(false);
@@ -167,7 +167,7 @@ export default function NewMemberDuesPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h1>
-          <p className="text-gray-600 mb-4">You don't have permission to create member dues.</p>
+          <p className="text-gray-600 mb-4">You don&apos;t have permission to create member dues.</p>
           <Link href="/admin/expenses/member-dues" className="text-indigo-600 hover:text-indigo-500">
             ← Back to Member Dues
           </Link>

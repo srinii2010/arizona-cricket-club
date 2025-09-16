@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Plus, DollarSign, Calendar, Users, CheckCircle, XCircle } from 'lucide-react';
+import { ArrowLeft, Plus, DollarSign, CheckCircle, XCircle } from 'lucide-react';
 
 interface MemberDue {
   id: string;
@@ -37,9 +37,9 @@ export default function MemberDuesPage() {
 
   useEffect(() => {
     fetchDues();
-  }, [selectedYear, filterStatus]);
+  }, [selectedYear, filterStatus, fetchDues]);
 
-  const fetchDues = async () => {
+  const fetchDues = useCallback(async () => {
     try {
       setLoading(true);
       const params = new URLSearchParams();
@@ -62,7 +62,7 @@ export default function MemberDuesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedYear, filterStatus]);
 
   const handleSettleDues = async (dueId: string) => {
     try {

@@ -96,7 +96,7 @@ export async function PUT(
     }
 
     // Build update object
-    const updateData: any = {};
+    const updateData: Record<string, unknown> = {};
     
     if (tournament_format_id !== undefined) updateData.tournament_format_id = tournament_format_id;
     if (category !== undefined) updateData.category = category;

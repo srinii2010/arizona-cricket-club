@@ -66,7 +66,7 @@ export async function PUT(
     }
 
     // Build update object
-    const updateData: any = {};
+    const updateData: Record<string, unknown> = {};
     
     if (tournament_format_ids !== undefined) updateData.tournament_format_ids = tournament_format_ids;
     if (season_dues !== undefined) updateData.season_dues = parseFloat(season_dues);

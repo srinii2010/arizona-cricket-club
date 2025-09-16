@@ -24,7 +24,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     const userEmail = await getUserEmailFromRequest(req)
 
     const updatable = ['first_name','last_name','email','phone','team_id','role','date_of_birth','gender']
-    const update: Record<string, any> = {}
+    const update: Record<string, unknown> = {}
     for (const k of updatable) {
       if (k in body) update[k] = body[k]
     }
@@ -42,8 +42,9 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
     return NextResponse.json({ member: data })
-  } catch (e: any) {
-    return NextResponse.json({ error: e?.message ?? 'Invalid JSON' }, { status: 400 })
+  } catch (e: unknown) {
+    const errorMessage = e instanceof Error ? e.message : 'Invalid JSON'
+    return NextResponse.json({ error: errorMessage }, { status: 400 })
   }
 }
 
