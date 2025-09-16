@@ -12,7 +12,10 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async session({ session, token }) {
       if (session?.user) {
-        session.user.id = token?.id || token?.sub || 'temp-id'
+        session.user = {
+          ...session.user,
+          id: token?.id || token?.sub || 'temp-id'
+        } as unknown as { id: string; name?: string | null; email?: string | null; image?: string | null }
         
         // Start with JWT role if available
         let userRole = (token as { role?: string })?.role
@@ -64,7 +67,10 @@ export const authOptions: NextAuthOptions = {
           console.log('No email, setting to unauthorized')
         }
         
-        session.user.role = userRole
+        session.user = {
+          ...session.user,
+          role: userRole
+        } as unknown as { id: string; name?: string | null; email?: string | null; image?: string | null; role: string }
         
         // Update token with the final role for middleware access
         if (token) {
@@ -76,7 +82,7 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       // Ensure token has stable identifiers
       if (user) {
-        token.id = profile?.sub || user.id
+        token.id = user.id
         token.email = user.email
       }
 

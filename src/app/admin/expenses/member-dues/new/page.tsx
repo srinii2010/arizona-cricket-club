@@ -25,6 +25,13 @@ interface TournamentFormat {
   };
 }
 
+interface Season {
+  id: string;
+  year: number;
+  name: string;
+  status: string;
+}
+
 export default function NewMemberDuesPage() {
   const router = useRouter();
   const { data: session } = useSession();
@@ -32,10 +39,11 @@ export default function NewMemberDuesPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [members, setMembers] = useState<Member[]>([]);
+  const [seasons, setSeasons] = useState<Season[]>([]);
   const [tournamentFormats, setTournamentFormats] = useState<TournamentFormat[]>([]);
   const [formData, setFormData] = useState({
     member_id: '',
-    year: new Date().getFullYear(),
+    year: '',
     tournament_format_ids: [] as string[],
     season_dues: '',
     extra_dues: '',
@@ -48,8 +56,14 @@ export default function NewMemberDuesPage() {
 
   useEffect(() => {
     fetchMembers();
-    fetchTournamentFormats();
+    fetchSeasons();
   }, []);
+
+  useEffect(() => {
+    if (formData.year) {
+      fetchTournamentFormats();
+    }
+  }, [formData.year]);
 
   const fetchMembers = async () => {
     try {
@@ -66,9 +80,28 @@ export default function NewMemberDuesPage() {
     }
   };
 
+  const fetchSeasons = async () => {
+    try {
+      const response = await fetch('/api/seasons');
+      const data = await response.json();
+      
+      if (response.ok) {
+        setSeasons(data.seasons || []);
+        // Set the first season as default if available
+        if (data.seasons && data.seasons.length > 0) {
+          setFormData(prev => ({ ...prev, year: data.seasons[0].year.toString() }));
+        }
+      } else {
+        setError('Failed to fetch seasons');
+      }
+    } catch {
+      setError('Failed to fetch seasons');
+    }
+  };
+
   const fetchTournamentFormats = async () => {
     try {
-      const response = await fetch('/api/tournament-formats');
+      const response = await fetch(`/api/tournament-formats?season_id=${seasons.find(s => s.year.toString() === formData.year)?.id || ''}`);
       const data = await response.json();
       
       if (response.ok) {
@@ -254,7 +287,7 @@ export default function NewMemberDuesPage() {
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div>
                 <label htmlFor="year" className="block text-sm font-medium text-gray-700">
-                  Season (Year) *
+                  Season *
                 </label>
                 <select
                   name="year"
@@ -264,14 +297,21 @@ export default function NewMemberDuesPage() {
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
                   required
                 >
-                  <option value={2024}>{formatSeason(2024)}</option>
-                  <option value={2025}>{formatSeason(2025)}</option>
-                  <option value={2026}>{formatSeason(2026)}</option>
-                  <option value={2027}>{formatSeason(2027)}</option>
-                  <option value={2028}>{formatSeason(2028)}</option>
-                  <option value={2029}>{formatSeason(2029)}</option>
-                  <option value={2030}>{formatSeason(2030)}</option>
+                  <option value="">Select a season</option>
+                  {seasons.map((season) => (
+                    <option key={season.id} value={season.year.toString()}>
+                      {formatSeason(season.year)} - {season.name}
+                    </option>
+                  ))}
                 </select>
+                {seasons.length === 0 && (
+                  <div className="text-sm text-gray-500 mt-2">
+                    No seasons available. 
+                    <Link href="/admin/seasons" className="text-green-600 hover:text-green-500 ml-1">
+                      Create a season first
+                    </Link>
+                  </div>
+                )}
               </div>
 
               <div>
@@ -297,30 +337,28 @@ export default function NewMemberDuesPage() {
                 Tournament Formats * (Select all that apply)
               </label>
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                {tournamentFormats
-                  .filter(format => format.seasons.year === parseInt(formData.year.toString()))
-                  .map((format) => (
-                    <label key={format.id} className="flex items-center p-3 border border-gray-200 rounded-md hover:bg-gray-50 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={formData.tournament_format_ids.includes(format.id)}
-                        onChange={(e) => handleFormatChange(format.id, e.target.checked)}
-                        className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
-                      />
-                      <div className="ml-3">
-                        <div className="text-sm font-medium text-gray-900">{format.name}</div>
-                        {format.description && (
-                          <div className="text-sm text-gray-500">{format.description}</div>
-                        )}
-                      </div>
-                    </label>
-                  ))}
+                {tournamentFormats.map((format) => (
+                  <label key={format.id} className="flex items-center p-3 border border-gray-200 rounded-md hover:bg-gray-50 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.tournament_format_ids.includes(format.id)}
+                      onChange={(e) => handleFormatChange(format.id, e.target.checked)}
+                      className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+                    />
+                    <div className="ml-3">
+                      <div className="text-sm font-medium text-gray-900">{format.name}</div>
+                      {format.description && (
+                        <div className="text-sm text-gray-500">{format.description}</div>
+                      )}
+                    </div>
+                  </label>
+                ))}
               </div>
-              {tournamentFormats.filter(format => format.seasons.year === parseInt(formData.year.toString())).length === 0 && (
+              {tournamentFormats.length === 0 && formData.year && (
                 <div className="text-sm text-gray-500 mt-2">
-                  No tournament formats available for {formData.year}. 
+                  No tournament formats available for this season. 
                   <Link href="/admin/seasons" className="text-green-600 hover:text-green-500 ml-1">
-                    Create a season first
+                    Add tournament formats to the season
                   </Link>
                 </div>
               )}

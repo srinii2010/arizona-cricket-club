@@ -15,12 +15,12 @@ export const useAuth = (requiredRole?: string) => {
     }
 
     // Check if user is unauthorized
-    if (session.user.role === 'unauthorized') {
+    if ((session.user as { role?: string })?.role === 'unauthorized') {
       router.push('/admin/unauthorized')
       return
     }
 
-    if (requiredRole && session.user.role !== requiredRole) {
+    if (requiredRole && (session.user as { role?: string })?.role !== requiredRole) {
       router.push('/admin/unauthorized')
       return
     }

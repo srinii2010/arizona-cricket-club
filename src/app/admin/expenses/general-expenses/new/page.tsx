@@ -25,6 +25,13 @@ interface TournamentFormat {
   };
 }
 
+interface Season {
+  id: string;
+  year: number;
+  name: string;
+  status: string;
+}
+
 const categories = [
   'Umpire',
   'Equipment', 
@@ -42,9 +49,10 @@ export default function NewGeneralExpensePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [members, setMembers] = useState<Member[]>([]);
+  const [seasons, setSeasons] = useState<Season[]>([]);
   const [tournamentFormats, setTournamentFormats] = useState<TournamentFormat[]>([]);
   const [formData, setFormData] = useState({
-    year: new Date().getFullYear(),
+    year: '',
     tournament_format_id: '',
     category: '',
     description: '',
@@ -58,8 +66,14 @@ export default function NewGeneralExpensePage() {
 
   useEffect(() => {
     fetchMembers();
-    fetchTournamentFormats();
+    fetchSeasons();
   }, []);
+
+  useEffect(() => {
+    if (formData.year) {
+      fetchTournamentFormats();
+    }
+  }, [formData.year]);
 
   const fetchMembers = async () => {
     try {
@@ -76,9 +90,28 @@ export default function NewGeneralExpensePage() {
     }
   };
 
+  const fetchSeasons = async () => {
+    try {
+      const response = await fetch('/api/seasons');
+      const data = await response.json();
+      
+      if (response.ok) {
+        setSeasons(data.seasons || []);
+        // Set the first season as default if available
+        if (data.seasons && data.seasons.length > 0) {
+          setFormData(prev => ({ ...prev, year: data.seasons[0].year.toString() }));
+        }
+      } else {
+        setError('Failed to fetch seasons');
+      }
+    } catch {
+      setError('Failed to fetch seasons');
+    }
+  };
+
   const fetchTournamentFormats = async () => {
     try {
-      const response = await fetch('/api/tournament-formats');
+      const response = await fetch(`/api/tournament-formats?season_id=${seasons.find(s => s.year.toString() === formData.year)?.id || ''}`);
       const data = await response.json();
       
       if (response.ok) {
@@ -211,7 +244,7 @@ export default function NewGeneralExpensePage() {
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div>
                 <label htmlFor="year" className="block text-sm font-medium text-gray-700">
-                  Season (Year) *
+                  Season *
                 </label>
                 <select
                   name="year"
@@ -221,14 +254,21 @@ export default function NewGeneralExpensePage() {
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500 sm:text-sm"
                   required
                 >
-                  <option value={2024}>{formatSeason(2024)}</option>
-                  <option value={2025}>{formatSeason(2025)}</option>
-                  <option value={2026}>{formatSeason(2026)}</option>
-                  <option value={2027}>{formatSeason(2027)}</option>
-                  <option value={2028}>{formatSeason(2028)}</option>
-                  <option value={2029}>{formatSeason(2029)}</option>
-                  <option value={2030}>{formatSeason(2030)}</option>
+                  <option value="">Select a season</option>
+                  {seasons.map((season) => (
+                    <option key={season.id} value={season.year.toString()}>
+                      {formatSeason(season.year)} - {season.name}
+                    </option>
+                  ))}
                 </select>
+                {seasons.length === 0 && (
+                  <div className="text-sm text-gray-500 mt-2">
+                    No seasons available. 
+                    <Link href="/admin/seasons" className="text-red-600 hover:text-red-500 ml-1">
+                      Create a season first
+                    </Link>
+                  </div>
+                )}
               </div>
 
               <div>
