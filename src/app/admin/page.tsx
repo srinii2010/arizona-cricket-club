@@ -86,9 +86,9 @@ export default function AdminDashboard() {
               Welcome to the Admin Console
             </h2>
             <p className="text-gray-600">
-              {user.role === 'admin' && "You have full administrative access to all features."}
-              {user.role === 'editor' && "You can view, create, and edit content. You cannot delete items or manage user access."}
-              {user.role === 'viewer' && "You have read-only access to view information in the admin console."}
+              {(user as { role?: string })?.role === 'admin' && "You have full administrative access to all features."}
+              {(user as { role?: string })?.role === 'editor' && "You can view, create, and edit content. You cannot delete items or manage user access."}
+              {(user as { role?: string })?.role === 'viewer' && "You have read-only access to view information in the admin console."}
             </p>
           </div>
         </div>
