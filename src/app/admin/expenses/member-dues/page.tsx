@@ -331,10 +331,10 @@ export default function MemberDuesPage() {
                         )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {due.created_by || 'N/A'}
+                        {(due as unknown as { created_by?: string }).created_by || 'N/A'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {due.last_updated_by || 'N/A'}
+                        {(due as unknown as { last_updated_by?: string }).last_updated_by || 'N/A'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 max-w-xs truncate" title={due.comments || ''}>
                         {due.comments || '-'}
