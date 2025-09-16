@@ -337,7 +337,7 @@ export default function EditSeasonPage({ params }: { params: Promise<{ id: strin
                 {formData.tournament_formats.length === 0 && (
                   <div className="text-center py-8 text-gray-500">
                     <p>No tournament formats added yet.</p>
-                    <p className="text-sm">Click "Add Format" to get started.</p>
+                    <p className="text-sm">Click &quot;Add Format&quot; to get started.</p>
                   </div>
                 )}
               </div>

@@ -116,9 +116,9 @@ export default function AdminLogin() {
           </button>
         </div>
         <div className="text-center">
-          <a href="/" className="text-sm text-blue-600 hover:text-blue-500">
+          <Link href="/" className="text-sm text-blue-600 hover:text-blue-500">
             ← Back to Home
-          </a>
+          </Link>
         </div>
       </div>
     </div>
