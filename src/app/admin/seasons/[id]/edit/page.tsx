@@ -35,10 +35,6 @@ export default function EditSeasonPage({ params }: { params: Promise<{ id: strin
 
   const formatSeason = (startYear: number) => `${startYear}-${startYear + 1}`;
 
-  useEffect(() => {
-    fetchSeason();
-  }, [id, fetchSeason]);
-
   const fetchSeason = useCallback(async () => {
     try {
       setLoading(true);
@@ -62,6 +58,10 @@ export default function EditSeasonPage({ params }: { params: Promise<{ id: strin
       setLoading(false);
     }
   }, [id]);
+
+  useEffect(() => {
+    fetchSeason();
+  }, [fetchSeason]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
