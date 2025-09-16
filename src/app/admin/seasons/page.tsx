@@ -108,7 +108,7 @@ export default function SeasonsPage() {
     return null;
   }
 
-  const permissions = getUserPermissions((user.role as UserRole) || 'viewer');
+  const permissions = getUserPermissions(((user as { role?: string })?.role as UserRole) || 'viewer');
 
   if (loading) {
     return (
