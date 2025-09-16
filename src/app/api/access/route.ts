@@ -34,7 +34,7 @@ export async function GET() {
     member_id: m.id,
     name: `${m.first_name} ${m.last_name}`.trim(),
     email: m.email,
-    team: m.teams?.name ?? null,
+    team: m.teams?.[0]?.name ?? null,
     rbac_role: (emailToRole.get((m.email || '').toLowerCase()) as RbacRole) || 'none',
     member_role: m.role
   }))
