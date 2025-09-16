@@ -35,10 +35,6 @@ export default function MemberDuesPage() {
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [totals, setTotals] = useState<{ total_dues: number; paid_dues: number; pending_dues: number }>({ total_dues: 0, paid_dues: 0, pending_dues: 0 });
 
-  useEffect(() => {
-    fetchDues();
-  }, [selectedYear, filterStatus, fetchDues]);
-
   const fetchDues = useCallback(async () => {
     try {
       setLoading(true);
@@ -63,6 +59,10 @@ export default function MemberDuesPage() {
       setLoading(false);
     }
   }, [selectedYear, filterStatus]);
+
+  useEffect(() => {
+    fetchDues();
+  }, [fetchDues]);
 
   const handleSettleDues = async (dueId: string) => {
     try {
