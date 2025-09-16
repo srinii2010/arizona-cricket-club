@@ -99,7 +99,7 @@ export default function NewSeasonPage() {
         const data = await response.json();
         setError(data.error || 'Failed to create season');
       }
-    } catch (err) {
+    } catch {
       setError('Failed to create season');
     } finally {
       setLoading(false);
@@ -119,7 +119,7 @@ export default function NewSeasonPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h1>
-          <p className="text-gray-600 mb-4">You don't have permission to create seasons.</p>
+          <p className="text-gray-600 mb-4">You don&apos;t have permission to create seasons.</p>
           <Link href="/admin/seasons" className="text-indigo-600 hover:text-indigo-500">
             ← Back to Seasons
           </Link>
@@ -282,7 +282,7 @@ export default function NewSeasonPage() {
                 {formData.tournament_formats.length === 0 && (
                   <div className="text-center py-8 text-gray-500">
                     <p>No tournament formats added yet.</p>
-                    <p className="text-sm">Click "Add Format" to get started.</p>
+                    <p className="text-sm">Click &quot;Add Format&quot; to get started.</p>
                   </div>
                 )}
               </div>

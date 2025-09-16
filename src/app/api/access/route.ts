@@ -81,7 +81,7 @@ export async function POST(req: NextRequest) {
 
     if ((existing?.length || 0) === 0) {
       // Insert a users record with this email and role
-      const insertPayload: any = {
+      const insertPayload: { email: string; role: RbacRole; name?: string } = {
         email,
         role,
       }
@@ -99,8 +99,9 @@ export async function POST(req: NextRequest) {
       if (updateErr) return NextResponse.json({ error: updateErr.message }, { status: 500 })
       return NextResponse.json({ ok: true, email, role })
     }
-  } catch (e: any) {
-    return NextResponse.json({ error: e?.message ?? 'Invalid JSON' }, { status: 400 })
+  } catch (e: unknown) {
+    const errorMessage = e instanceof Error ? e.message : 'Invalid JSON'
+    return NextResponse.json({ error: errorMessage }, { status: 400 })
   }
 }
 
