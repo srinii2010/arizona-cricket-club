@@ -50,14 +50,14 @@ export default function AdminDashboard() {
             <div className="flex items-center">
               <h1 className="text-3xl font-bold text-gray-900">Admin Console</h1>
               <span className={`ml-4 px-3 py-1 text-sm font-medium rounded-full ${
-                user.role === 'admin' ? 'bg-red-100 text-red-800' :
-                user.role === 'editor' ? 'bg-yellow-100 text-yellow-800' :
+                (user as { role?: string })?.role === 'admin' ? 'bg-red-100 text-red-800' :
+                (user as { role?: string })?.role === 'editor' ? 'bg-yellow-100 text-yellow-800' :
                 'bg-blue-100 text-blue-800'
               }`}>
-                {user.role === 'admin' && <Shield className="h-4 w-4 inline mr-1" />}
-                {user.role === 'editor' && <Edit className="h-4 w-4 inline mr-1" />}
-                {user.role === 'viewer' && <Eye className="h-4 w-4 inline mr-1" />}
-                {user.role.toUpperCase()}
+                {(user as { role?: string })?.role === 'admin' && <Shield className="h-4 w-4 inline mr-1" />}
+                {(user as { role?: string })?.role === 'editor' && <Edit className="h-4 w-4 inline mr-1" />}
+                {(user as { role?: string })?.role === 'viewer' && <Eye className="h-4 w-4 inline mr-1" />}
+                {(user as { role?: string })?.role?.toUpperCase() || 'VIEWER'}
               </span>
             </div>
             <div className="flex items-center space-x-4">
