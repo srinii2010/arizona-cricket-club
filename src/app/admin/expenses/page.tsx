@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { DollarSign, Receipt, ArrowLeft, Users, FileText } from 'lucide-react';
+import { DollarSign, Receipt, Users, FileText } from 'lucide-react';
 import AdminGuard from '@/components/AdminGuard';
 import { useSession } from 'next-auth/react';
 import { getUserPermissions, UserRole } from '@/lib/permissions';
@@ -10,7 +10,7 @@ import { getUserPermissions, UserRole } from '@/lib/permissions';
 export default function ExpenseManagementPage() {
   const { data: session } = useSession();
   const user = session?.user;
-  const [loading, setLoading] = useState(true);
+  const [, setLoading] = useState(true);
   const [totals, setTotals] = useState({ pendingMember: 0, pendingExpenses: 0 });
   const currentYear = new Date().getFullYear();
   const formatSeason = (startYear: number) => `${startYear}-${startYear + 1}`;
@@ -29,14 +29,14 @@ export default function ExpenseManagementPage() {
         const pendingExpenses = expensesRes.ok ? (expensesData.totals?.pending_amount || 0) : 0;
 
         setTotals({ pendingMember, pendingExpenses });
-      } catch (e) {
+      } catch {
         setTotals({ pendingMember: 0, pendingExpenses: 0 });
       } finally {
         setLoading(false);
       }
     };
     fetchTotals();
-  }, []);
+  }, [currentYear]);
 
   if (!user) {
     return null;

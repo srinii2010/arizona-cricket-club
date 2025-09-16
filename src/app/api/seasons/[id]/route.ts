@@ -4,9 +4,10 @@ import { getUserEmailFromRequest } from '@/lib/auth-utils';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const { data: season, error } = await supabaseAdmin
       .from('seasons')
       .select(`
@@ -17,7 +18,7 @@ export async function GET(
           description
         )
       `)
-      .eq('id', params.id)
+      .eq('id', id)
       .single();
 
     if (error) {
@@ -34,9 +35,10 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await request.json();
     const userEmail = await getUserEmailFromRequest(request);
     const { year, name, status, tournament_formats } = body;
@@ -51,7 +53,7 @@ export async function PUT(
       .from('seasons')
       .select('id')
       .eq('year', year)
-      .neq('id', params.id)
+      .neq('id', id)
       .single();
 
     if (existingSeason) {
@@ -67,7 +69,7 @@ export async function PUT(
         status,
         last_updated_by: userEmail
       })
-      .eq('id', params.id)
+      .eq('id', id)
       .select()
       .single();
 
@@ -82,12 +84,12 @@ export async function PUT(
       await supabaseAdmin
         .from('tournament_formats')
         .delete()
-        .eq('season_id', params.id);
+        .eq('season_id', id);
 
       // Insert new formats
       if (tournament_formats.length > 0) {
         const formatsToInsert = tournament_formats.map((format: { name: string; description?: string }) => ({
-          season_id: params.id,
+          season_id: id,
           name: format.name,
           description: format.description || null
         }));
@@ -114,7 +116,7 @@ export async function PUT(
           description
         )
       `)
-      .eq('id', params.id)
+      .eq('id', id)
       .single();
 
     if (fetchError) {
@@ -131,20 +133,21 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     // Check if season has any associated data
     const { data: memberDues } = await supabaseAdmin
       .from('member_dues')
       .select('id')
-      .eq('year', (await supabaseAdmin.from('seasons').select('year').eq('id', params.id).single()).data?.year)
+      .eq('year', (await supabaseAdmin.from('seasons').select('year').eq('id', id).single()).data?.year)
       .limit(1);
 
     const { data: generalExpenses } = await supabaseAdmin
       .from('general_expenses')
       .select('id')
-      .eq('year', (await supabaseAdmin.from('seasons').select('year').eq('id', params.id).single()).data?.year)
+      .eq('year', (await supabaseAdmin.from('seasons').select('year').eq('id', id).single()).data?.year)
       .limit(1);
 
     if (memberDues && memberDues.length > 0) {
@@ -159,7 +162,7 @@ export async function DELETE(
     const { error } = await supabaseAdmin
       .from('seasons')
       .delete()
-      .eq('id', params.id);
+      .eq('id', id);
 
     if (error) {
       console.error('Error deleting season:', error);
