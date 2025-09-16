@@ -211,8 +211,8 @@ export default function SeasonsPage() {
                         {season.tournament_formats.length} tournament format{season.tournament_formats.length !== 1 ? 's' : ''}
                       </p>
                       <div className="mt-2 text-xs text-gray-500">
-                        <div>Created by: {season.created_by || 'N/A'}</div>
-                        <div>Last updated by: {season.last_updated_by || 'N/A'}</div>
+                        <div>Created by: {(season as unknown as { created_by?: string }).created_by || 'N/A'}</div>
+                        <div>Last updated by: {(season as unknown as { last_updated_by?: string }).last_updated_by || 'N/A'}</div>
                       </div>
                       {season.tournament_formats.length > 0 && (
                         <div className="mt-2">
