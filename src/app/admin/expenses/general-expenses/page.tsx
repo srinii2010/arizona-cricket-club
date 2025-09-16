@@ -361,7 +361,7 @@ export default function GeneralExpensesPage() {
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {expense && (expense as any).created_at ? formatDate((expense as any).created_at) : '-'}
+                        {expense && (expense as unknown as { created_at?: string }).created_at ? formatDate((expense as unknown as { created_at: string }).created_at) : '-'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         {expense.settlement_status === 'Not Settled' && (
