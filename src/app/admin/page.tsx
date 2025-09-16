@@ -35,9 +35,9 @@ export default function AdminDashboard() {
     return null
   }
 
-  const permissions = getUserPermissions((user.role as UserRole) || 'viewer')
+  const permissions = getUserPermissions(((user as { role?: string })?.role as UserRole) || 'viewer')
   
-  console.log('AdminDashboard - User role:', user.role)
+  console.log('AdminDashboard - User role:', (user as { role?: string })?.role)
   console.log('AdminDashboard - Permissions:', permissions)
 
   return (
