@@ -3,7 +3,7 @@
 import { useSession } from 'next-auth/react'
 import { signOut } from 'next-auth/react'
 import Link from 'next/link'
-import { Users, DollarSign, Calendar, Settings, LogOut, Trophy, Receipt, Eye, Edit, Shield } from 'lucide-react'
+import { Users, DollarSign, Calendar, Settings, LogOut, Trophy, Eye, Edit, Shield } from 'lucide-react'
 import { getUserPermissions, UserRole } from '@/lib/permissions'
 import AdminGuard from '@/components/AdminGuard'
 
