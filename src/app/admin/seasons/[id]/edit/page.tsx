@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
@@ -37,9 +37,9 @@ export default function EditSeasonPage({ params }: { params: Promise<{ id: strin
 
   useEffect(() => {
     fetchSeason();
-  }, [id]);
+  }, [id, fetchSeason]);
 
-  const fetchSeason = async () => {
+  const fetchSeason = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch(`/api/seasons/${id}`);
@@ -56,12 +56,12 @@ export default function EditSeasonPage({ params }: { params: Promise<{ id: strin
       } else {
         setError(data.error || 'Failed to fetch season');
       }
-    } catch (err) {
+    } catch {
       setError('Failed to fetch season');
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -133,7 +133,7 @@ export default function EditSeasonPage({ params }: { params: Promise<{ id: strin
         const data = await response.json();
         setError(data.error || 'Failed to update season');
       }
-    } catch (err) {
+    } catch {
       setError('Failed to update season');
     } finally {
       setSaving(false);
