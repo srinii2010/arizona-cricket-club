@@ -379,10 +379,10 @@ export default function GeneralExpensesPage() {
                         )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {expense.created_by || 'N/A'}
+                        {(expense as unknown as { created_by?: string }).created_by || 'N/A'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {expense.last_updated_by || 'N/A'}
+                        {(expense as unknown as { last_updated_by?: string }).last_updated_by || 'N/A'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 max-w-xs truncate" title={expense.comments || ''}>
                         {expense.comments || '-'}
