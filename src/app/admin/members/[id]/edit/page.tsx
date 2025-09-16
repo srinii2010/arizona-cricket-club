@@ -36,11 +36,6 @@ export default function EditMemberPage() {
     gender: ''
   })
 
-  useEffect(() => {
-    if (!memberId) return
-    Promise.all([loadTeams(), loadMember()]).finally(() => setLoading(false))
-  }, [memberId, loadMember])
-
   const loadTeams = async () => {
     const res = await fetch('/api/teams', { cache: 'no-store' })
     if (!res.ok) return
@@ -64,6 +59,11 @@ export default function EditMemberPage() {
       gender: m.gender || ''
     })
   }, [memberId])
+
+  useEffect(() => {
+    if (!memberId) return
+    Promise.all([loadTeams(), loadMember()]).finally(() => setLoading(false))
+  }, [memberId, loadMember])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
