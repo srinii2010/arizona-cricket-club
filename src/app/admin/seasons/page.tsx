@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Plus, Pencil, Trash2, Eye } from 'lucide-react';
+import { Plus, Pencil, Trash2 } from 'lucide-react';
 import AdminGuard from '@/components/AdminGuard';
 import { useSession } from 'next-auth/react';
 import { getUserPermissions, UserRole } from '@/lib/permissions';
@@ -47,7 +47,7 @@ export default function SeasonsPage() {
       } else {
         setError(data.error || 'Failed to fetch seasons');
       }
-    } catch (err) {
+    } catch {
       setError('Failed to fetch seasons');
     } finally {
       setLoading(false);
@@ -71,7 +71,7 @@ export default function SeasonsPage() {
         const data = await response.json();
         alert(data.error || 'Failed to delete season');
       }
-    } catch (err) {
+    } catch {
       alert('Failed to delete season');
     } finally {
       setDeleteLoading(null);
@@ -99,7 +99,7 @@ export default function SeasonsPage() {
         const data = await response.json();
         alert(data.error || 'Failed to update season status');
       }
-    } catch (err) {
+    } catch {
       alert('Failed to update season status');
     }
   };

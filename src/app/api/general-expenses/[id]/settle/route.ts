@@ -4,9 +4,10 @@ import { getUserEmailFromRequest } from '@/lib/auth-utils';
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await request.json();
     const userEmail = await getUserEmailFromRequest(request);
     const { settlement_date } = body;
@@ -19,7 +20,7 @@ export async function POST(
         settlement_date: settlement_date || new Date().toISOString().split('T')[0],
         last_updated_by: userEmail
       })
-      .eq('id', params.id)
+      .eq('id', id)
       .select(`
         *,
         members (
