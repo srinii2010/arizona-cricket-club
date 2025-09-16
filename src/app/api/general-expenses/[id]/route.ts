@@ -4,9 +4,10 @@ import { getUserEmailFromRequest } from '@/lib/auth-utils';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const { data: expense, error } = await supabaseAdmin
       .from('general_expenses')
       .select(`
@@ -23,7 +24,7 @@ export async function GET(
           name
         )
       `)
-      .eq('id', params.id)
+      .eq('id', id)
       .single();
 
     if (error) {
@@ -40,9 +41,10 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await request.json();
     const userEmail = await getUserEmailFromRequest(request);
     const {
@@ -114,7 +116,7 @@ export async function PUT(
     const { data: expense, error } = await supabaseAdmin
       .from('general_expenses')
       .update(updateData)
-      .eq('id', params.id)
+      .eq('id', id)
       .select(`
         *,
         members (
@@ -145,13 +147,14 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const { error } = await supabaseAdmin
       .from('general_expenses')
       .delete()
-      .eq('id', params.id);
+      .eq('id', id);
 
     if (error) {
       console.error('Error deleting general expense:', error);

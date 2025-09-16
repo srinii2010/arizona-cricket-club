@@ -5,7 +5,6 @@ import { useEffect, useState, useCallback } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import AdminGuard from '@/components/AdminGuard'
-import { getUserPermissions, UserRole } from '@/lib/permissions'
 
 interface MemberRow {
   id: string
@@ -56,7 +55,6 @@ export default function TeamMembersPage() {
     return null;
   }
 
-  const userRole = (user as { role?: string })?.role as UserRole || 'viewer';
 
   if (loading) {
     return (
