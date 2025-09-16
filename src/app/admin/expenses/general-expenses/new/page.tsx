@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Receipt, Calendar, Users, Trophy } from 'lucide-react';
+import { ArrowLeft, Users, Trophy } from 'lucide-react';
 import AdminGuard from '@/components/AdminGuard';
 import { useSession } from 'next-auth/react';
 import { getUserPermissions, UserRole } from '@/lib/permissions';
@@ -71,7 +71,7 @@ export default function NewGeneralExpensePage() {
       } else {
         setError('Failed to fetch members');
       }
-    } catch (err) {
+    } catch {
       setError('Failed to fetch members');
     }
   };
@@ -86,7 +86,7 @@ export default function NewGeneralExpensePage() {
       } else {
         setError('Failed to fetch tournament formats');
       }
-    } catch (err) {
+    } catch {
       setError('Failed to fetch tournament formats');
     }
   };
@@ -134,19 +134,13 @@ export default function NewGeneralExpensePage() {
         const data = await response.json();
         setError(data.error || 'Failed to create general expense');
       }
-    } catch (err) {
+    } catch {
       setError('Failed to create general expense');
     } finally {
       setLoading(false);
     }
   };
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount);
-  };
 
   const selectedMember = members.find(m => m.id === formData.paid_by_member_id);
   const selectedFormat = tournamentFormats.find(f => f.id === formData.tournament_format_id);
@@ -164,7 +158,7 @@ export default function NewGeneralExpensePage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h1>
-          <p className="text-gray-600 mb-4">You don't have permission to create general expenses.</p>
+          <p className="text-gray-600 mb-4">You don&apos;t have permission to create general expenses.</p>
           <Link href="/admin/expenses/general-expenses" className="text-indigo-600 hover:text-indigo-500">
             ← Back to General Expenses
           </Link>

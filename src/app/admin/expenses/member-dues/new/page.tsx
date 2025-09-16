@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, DollarSign, Calendar, Users } from 'lucide-react';
+import { ArrowLeft, Users } from 'lucide-react';
 import AdminGuard from '@/components/AdminGuard';
 import { useSession } from 'next-auth/react';
 import { getUserPermissions, UserRole } from '@/lib/permissions';

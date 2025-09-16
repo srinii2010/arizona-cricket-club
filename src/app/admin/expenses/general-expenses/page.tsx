@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Plus, Receipt, Calendar, Users, CheckCircle, XCircle } from 'lucide-react';
+import { ArrowLeft, Plus, Receipt, CheckCircle, XCircle } from 'lucide-react';
 
 interface GeneralExpense {
   id: string;
@@ -50,9 +50,9 @@ export default function GeneralExpensesPage() {
 
   useEffect(() => {
     fetchExpenses();
-  }, [selectedYear, filterCategory, filterStatus]);
+  }, [selectedYear, filterCategory, filterStatus, fetchExpenses]);
 
-  const fetchExpenses = async () => {
+  const fetchExpenses = useCallback(async () => {
     try {
       setLoading(true);
       const params = new URLSearchParams();
@@ -73,12 +73,12 @@ export default function GeneralExpensesPage() {
       } else {
         setError(data.error || 'Failed to fetch general expenses');
       }
-    } catch (err) {
+    } catch {
       setError('Failed to fetch general expenses');
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedYear, filterCategory, filterStatus]);
 
   const handleSettleExpense = async (expenseId: string) => {
     try {
@@ -98,7 +98,7 @@ export default function GeneralExpensesPage() {
         const data = await response.json();
         alert(data.error || 'Failed to settle expense');
       }
-    } catch (err) {
+    } catch {
       alert('Failed to settle expense');
     }
   };
@@ -361,7 +361,7 @@ export default function GeneralExpensesPage() {
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {expense && (expense as any).created_at ? formatDate((expense as any).created_at) : '-'}
+                        {expense && (expense as { created_at?: string }).created_at ? formatDate((expense as { created_at: string }).created_at) : '-'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         {expense.settlement_status === 'Not Settled' && (
