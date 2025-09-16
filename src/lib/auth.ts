@@ -15,7 +15,7 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token?.id || token?.sub || 'temp-id'
         
         // Start with JWT role if available
-        let userRole = (token as any)?.role
+        let userRole = (token as { role?: string })?.role
         console.log('Session - Starting with JWT role:', userRole, 'for email:', session.user.email)
         
         // Try to get role from database
@@ -68,12 +68,12 @@ export const authOptions: NextAuthOptions = {
         
         // Update token with the final role for middleware access
         if (token) {
-          (token as any).role = userRole
+          (token as { role?: string }).role = userRole
         }
       }
       return session
     },
-    async jwt({ token, user, account, profile }) {
+    async jwt({ token, user }) {
       // Ensure token has stable identifiers
       if (user) {
         token.id = profile?.sub || user.id
@@ -81,11 +81,11 @@ export const authOptions: NextAuthOptions = {
       }
 
       // Set role in JWT for middleware access
-      const email = (token as any)?.email as string | undefined
-      if (email && !(token as any)?.role) {
+      const email = (token as { email?: string })?.email as string | undefined
+      if (email && !(token as { role?: string })?.role) {
         // Only set admin role for specific email, others will be handled by session callback
         if (email === 'srinii2005@gmail.com') {
-          ;(token as any).role = 'admin'
+          ;(token as { role?: string }).role = 'admin'
           console.log('JWT - Set admin role for:', email)
         } else {
           // Don't set a default role - let session callback handle it from database
@@ -94,7 +94,7 @@ export const authOptions: NextAuthOptions = {
       }
       return token
     },
-    async signIn({ user, account, profile }) {
+    async signIn() {
       // Allow all users to sign in, but check authorization in session callback
       return true
     },

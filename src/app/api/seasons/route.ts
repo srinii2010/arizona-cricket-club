@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
 
     // Create tournament formats if provided
     if (tournament_formats.length > 0) {
-      const formatsToInsert = tournament_formats.map((format: any) => ({
+      const formatsToInsert = tournament_formats.map((format: { name: string; description?: string }) => ({
         season_id: season.id,
         name: format.name,
         description: format.description || null

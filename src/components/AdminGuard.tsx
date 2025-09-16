@@ -45,7 +45,7 @@ export default function AdminGuard({ children, requiredRole = 'viewer' }: AdminG
     } else {
       setIsLoading(false)
     }
-  }, [session, status, requiredRole]) // Removed router from dependencies
+  }, [session, status, requiredRole, router])
 
   if (isLoading) {
     return (

@@ -86,7 +86,7 @@ export async function PUT(
 
       // Insert new formats
       if (tournament_formats.length > 0) {
-        const formatsToInsert = tournament_formats.map((format: any) => ({
+        const formatsToInsert = tournament_formats.map((format: { name: string; description?: string }) => ({
           season_id: params.id,
           name: format.name,
           description: format.description || null

@@ -70,6 +70,6 @@ export function getUserPermissions(role: UserRole): UserPermissions {
 
 export async function getCurrentUserPermissions(): Promise<UserPermissions> {
   const session = await getServerSession(authOptions)
-  const role = (session?.user as any)?.role as UserRole || 'unauthorized'
+  const role = (session?.user as { role?: string })?.role as UserRole || 'unauthorized'
   return getUserPermissions(role)
 }

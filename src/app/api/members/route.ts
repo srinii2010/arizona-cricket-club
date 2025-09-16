@@ -62,8 +62,9 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ member: data }, { status: 201 })
-  } catch (e: any) {
-    return NextResponse.json({ error: e?.message ?? 'Invalid JSON' }, { status: 400 })
+  } catch (e: unknown) {
+    const errorMessage = e instanceof Error ? e.message : 'Invalid JSON'
+    return NextResponse.json({ error: errorMessage }, { status: 400 })
   }
 }
 
