@@ -89,7 +89,7 @@ export async function PUT(
       const { data: currentDues } = await supabaseAdmin
         .from('member_dues')
         .select('season_dues, extra_jersey_dues, extra_trouser_dues, credit_adjustment')
-        .eq('id', params.id)
+        .eq('id', id)
         .single();
 
       if (currentDues) {
