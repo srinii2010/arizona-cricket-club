@@ -1,111 +1,190 @@
-import Link from 'next/link'
+'use client'
 
-export default function AdminConsole() {
+import { useSession } from 'next-auth/react'
+import { signOut } from 'next-auth/react'
+import Link from 'next/link'
+import { Users, DollarSign, Calendar, Settings, LogOut, Trophy, Receipt, Eye, Edit, Shield } from 'lucide-react'
+import { getUserPermissions, UserRole } from '@/lib/permissions'
+import AdminGuard from '@/components/AdminGuard'
+
+export default function AdminDashboard() {
+  const { data: session, status } = useSession()
+  const user = session?.user
+
+  console.log('AdminDashboard - Session:', session)
+  console.log('AdminDashboard - User:', user)
+
+  const handleLogout = async () => {
+    await signOut({ callbackUrl: '/' })
+  }
+
+  // Show loading while session is being fetched
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // If no session, return null (AdminGuard will handle redirect)
+  if (!session || !user) {
+    return null
+  }
+
+  const permissions = getUserPermissions((user.role as UserRole) || 'viewer')
+  
+  console.log('AdminDashboard - User role:', user.role)
+  console.log('AdminDashboard - Permissions:', permissions)
+
   return (
+    <AdminGuard requiredRole="viewer">
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center">
-              <h1 className="text-3xl font-bold text-green-800">Admin Console</h1>
+              <h1 className="text-3xl font-bold text-gray-900">Admin Console</h1>
+              <span className={`ml-4 px-3 py-1 text-sm font-medium rounded-full ${
+                user.role === 'admin' ? 'bg-red-100 text-red-800' :
+                user.role === 'editor' ? 'bg-yellow-100 text-yellow-800' :
+                'bg-blue-100 text-blue-800'
+              }`}>
+                {user.role === 'admin' && <Shield className="h-4 w-4 inline mr-1" />}
+                {user.role === 'editor' && <Edit className="h-4 w-4 inline mr-1" />}
+                {user.role === 'viewer' && <Eye className="h-4 w-4 inline mr-1" />}
+                {user.role.toUpperCase()}
+              </span>
             </div>
-            <Link href="/" className="text-gray-600 hover:text-green-600">← Back to Home</Link>
+            <div className="flex items-center space-x-4">
+              <span className="text-gray-600">Welcome, {user.name}</span>
+              <button
+                onClick={handleLogout}
+                className="flex items-center text-gray-600 hover:text-red-600"
+              >
+                <LogOut className="h-4 w-4 mr-1" />
+                Logout
+              </button>
+              <Link href="/" className="text-gray-600 hover:text-blue-600">
+                ← Back to Home
+              </Link>
+            </div>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">Arizona Cricket Club</h2>
-          <p className="text-xl text-gray-600">Administrative Dashboard</p>
-        </div>
-
-        {/* Admin Categories */}
-        <div className="grid md:grid-cols-3 gap-8">
-          {/* Category 1: Authoring Content */}
-          <div className="bg-white rounded-lg shadow-xl p-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                </svg>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Authoring Content</h3>
-              <p className="text-gray-600 mb-6">Manage homepage content, sponsors, team information, and announcements</p>
-              <div className="space-y-2">
-                <Link href="/admin/content/homepage" className="block w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">
-                  Homepage Content
-                </Link>
-                <Link href="/admin/content/sponsors" className="block w-full bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors">
-                  Sponsor Management
-                </Link>
-                <Link href="/admin/content/teams" className="block w-full bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors">
-                  Team Information
-                </Link>
-                <Link href="/admin/content/news" className="block w-full bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors">
-                  News & Announcements
-                </Link>
-              </div>
-            </div>
-          </div>
-
-          {/* Category 2: Expense Report Creation */}
-          <div className="bg-white rounded-lg shadow-xl p-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                </svg>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Expense Report Creation</h3>
-              <p className="text-gray-600 mb-6">Create and manage expense reports by year, category, and format</p>
-              <div className="space-y-2">
-                <Link href="/admin/expenses/yearly-dues" className="block w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
-                  Yearly Dues
-                </Link>
-                <Link href="/admin/expenses/categories" className="block w-full bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors">
-                  Expense Categories
-                </Link>
-                <Link href="/admin/expenses/reports" className="block w-full bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors">
-                  Report Formats
-                </Link>
-                <Link href="/admin/expenses/payments" className="block w-full bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors">
-                  Payment Tracking
-                </Link>
-              </div>
-            </div>
-          </div>
-
-          {/* Category 3: Schedule Management */}
-          <div className="bg-white rounded-lg shadow-xl p-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Schedule Management</h3>
-              <p className="text-gray-600 mb-6">Manage game schedules, availability tracking, and venue management</p>
-              <div className="space-y-2">
-                <Link href="/admin/schedule/games" className="block w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors">
-                  Game Scheduling
-                </Link>
-                <Link href="/admin/schedule/availability" className="block w-full bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors">
-                  Availability Tracking
-                </Link>
-                <Link href="/admin/schedule/venues" className="block w-full bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors">
-                  Venue Management
-                </Link>
-                <Link href="/admin/schedule/calendar" className="block w-full bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors">
-                  Calendar View
-                </Link>
-              </div>
-            </div>
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Role-based welcome message */}
+        <div className="mb-8">
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+              Welcome to the Admin Console
+            </h2>
+            <p className="text-gray-600">
+              {user.role === 'admin' && "You have full administrative access to all features."}
+              {user.role === 'editor' && "You can view, create, and edit content. You cannot delete items or manage user access."}
+              {user.role === 'viewer' && "You have read-only access to view information in the admin console."}
+            </p>
           </div>
         </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {/* Member Management */}
+          {permissions.canManageMembers && (
+            <Link href="/admin/members" className="group">
+              <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+                <div className="flex items-center">
+                  <Users className="h-8 w-8 text-blue-600" />
+                  <h3 className="ml-3 text-lg font-medium text-gray-900">Member Management</h3>
+                </div>
+                <p className="mt-2 text-sm text-gray-600">
+                  {permissions.canCreate ? 'Add, edit, and manage club members. Assign teams and roles.' : 'View club members and their information.'}
+                </p>
+              </div>
+            </Link>
+          )}
+
+          {/* Season Management */}
+          {permissions.canManageSeasons && (
+            <Link href="/admin/seasons" className="group">
+              <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+                <div className="flex items-center">
+                  <Trophy className="h-8 w-8 text-yellow-600" />
+                  <h3 className="ml-3 text-lg font-medium text-gray-900">Season Management</h3>
+                </div>
+                <p className="mt-2 text-sm text-gray-600">
+                  {permissions.canCreate ? 'Manage tournament seasons and formats.' : 'View tournament seasons and formats.'}
+                </p>
+              </div>
+            </Link>
+          )}
+
+          {/* Expense Management */}
+          {permissions.canManageExpenses && (
+            <Link href="/admin/expenses" className="group">
+              <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+                <div className="flex items-center">
+                  <DollarSign className="h-8 w-8 text-green-600" />
+                  <h3 className="ml-3 text-lg font-medium text-gray-900">Expense Management</h3>
+                </div>
+                <p className="mt-2 text-sm text-gray-600">
+                  {permissions.canCreate ? 'Manage member dues and general expenses.' : 'View member dues and general expenses.'}
+                </p>
+              </div>
+            </Link>
+          )}
+
+          {/* Team Management */}
+          {permissions.canManageTeams && (
+            <Link href="/admin/teams" className="group">
+              <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+                <div className="flex items-center">
+                  <Calendar className="h-8 w-8 text-purple-600" />
+                  <h3 className="ml-3 text-lg font-medium text-gray-900">Team Management</h3>
+                </div>
+                <p className="mt-2 text-sm text-gray-600">
+                  {permissions.canCreate ? 'Manage teams and team assignments.' : 'View teams and team assignments.'}
+                </p>
+              </div>
+            </Link>
+          )}
+
+          {/* Access Management - Only for admins */}
+          {permissions.canManageAccess && (
+            <Link href="/admin/users" className="group">
+              <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+                <div className="flex items-center">
+                  <Settings className="h-8 w-8 text-orange-600" />
+                  <h3 className="ml-3 text-lg font-medium text-gray-900">Access Management</h3>
+                </div>
+                <p className="mt-2 text-sm text-gray-600">
+                  Grant admin/editor/viewer access to members.
+                </p>
+              </div>
+            </Link>
+          )}
+        </div>
+
+        {/* Show message if user has no permissions */}
+        {!permissions.canView && (
+          <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4">
+            <div className="flex">
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-yellow-800">Limited Access</h3>
+                <div className="mt-2 text-sm text-yellow-700">
+                  You have limited access to the admin console. Contact an administrator for additional permissions.
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </div>
+    </AdminGuard>
   )
 }
