@@ -48,10 +48,6 @@ export default function GeneralExpensesPage() {
     'Others'
   ];
 
-  useEffect(() => {
-    fetchExpenses();
-  }, [selectedYear, filterCategory, filterStatus, fetchExpenses]);
-
   const fetchExpenses = useCallback(async () => {
     try {
       setLoading(true);
@@ -79,6 +75,10 @@ export default function GeneralExpensesPage() {
       setLoading(false);
     }
   }, [selectedYear, filterCategory, filterStatus]);
+
+  useEffect(() => {
+    fetchExpenses();
+  }, [fetchExpenses]);
 
   const handleSettleExpense = async (expenseId: string) => {
     try {
