@@ -25,11 +25,6 @@ export default function TeamMembersPage() {
   const [rows, setRows] = useState<MemberRow[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    if (!teamId) return
-    load()
-  }, [teamId, load])
-
   const load = useCallback(async () => {
     setLoading(true)
     try {
@@ -50,6 +45,11 @@ export default function TeamMembersPage() {
       setLoading(false)
     }
   }, [teamId])
+
+  useEffect(() => {
+    if (!teamId) return
+    load()
+  }, [teamId, load])
 
   if (!user) {
     return null;
