@@ -3,9 +3,10 @@ import { supabaseAdmin } from '@/lib/supabase';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const { data: format, error } = await supabaseAdmin
       .from('tournament_formats')
       .select(`
@@ -16,7 +17,7 @@ export async function GET(
           name
         )
       `)
-      .eq('id', params.id)
+      .eq('id', id)
       .single();
 
     if (error) {
@@ -33,9 +34,10 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await request.json();
     const { name, description } = body;
 
@@ -48,7 +50,7 @@ export async function PUT(
     const { data: currentFormat } = await supabaseAdmin
       .from('tournament_formats')
       .select('season_id')
-      .eq('id', params.id)
+      .eq('id', id)
       .single();
 
     if (!currentFormat) {
@@ -61,7 +63,7 @@ export async function PUT(
       .select('id')
       .eq('season_id', currentFormat.season_id)
       .eq('name', name)
-      .neq('id', params.id)
+      .neq('id', id)
       .single();
 
     if (existingFormat) {
@@ -75,7 +77,7 @@ export async function PUT(
         name,
         description: description || null
       })
-      .eq('id', params.id)
+      .eq('id', id)
       .select(`
         *,
         seasons (
@@ -100,20 +102,21 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     // Check if format has any associated data
     const { data: memberDues } = await supabaseAdmin
       .from('member_dues')
       .select('id')
-      .contains('tournament_format_ids', [params.id])
+      .contains('tournament_format_ids', [id])
       .limit(1);
 
     const { data: generalExpenses } = await supabaseAdmin
       .from('general_expenses')
       .select('id')
-      .eq('tournament_format_id', params.id)
+      .eq('tournament_format_id', id)
       .limit(1);
 
     if (memberDues && memberDues.length > 0) {
@@ -128,7 +131,7 @@ export async function DELETE(
     const { error } = await supabaseAdmin
       .from('tournament_formats')
       .delete()
-      .eq('id', params.id);
+      .eq('id', id);
 
     if (error) {
       console.error('Error deleting tournament format:', error);

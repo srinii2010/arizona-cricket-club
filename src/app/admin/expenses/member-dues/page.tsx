@@ -57,7 +57,7 @@ export default function MemberDuesPage() {
       } else {
         setError(data.error || 'Failed to fetch member dues');
       }
-    } catch (err) {
+    } catch {
       setError('Failed to fetch member dues');
     } finally {
       setLoading(false);
@@ -82,7 +82,7 @@ export default function MemberDuesPage() {
         const data = await response.json();
         alert(data.error || 'Failed to settle dues');
       }
-    } catch (err) {
+    } catch {
       alert('Failed to settle dues');
     }
   };
