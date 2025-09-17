@@ -18,13 +18,17 @@ export async function middleware(request: NextRequest) {
     }
 
     const role = (token as any)?.role
+    console.log('Middleware - User role:', role, 'for path:', pathname)
 
     // Allow only viewer, editor, and admin roles to access admin console
     // Block 'none', 'unauthorized', or any other role
     if (!['viewer', 'editor', 'admin'].includes(role)) {
+      console.log('Middleware - Access denied for role:', role)
       const deniedUrl = new URL('/admin/unauthorized', request.url)
       return NextResponse.redirect(deniedUrl)
     }
+    
+    console.log('Middleware - Access granted for role:', role)
   }
 
   return NextResponse.next()

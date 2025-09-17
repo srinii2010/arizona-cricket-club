@@ -15,8 +15,16 @@ export default function AdminLogin() {
     getSession().then((session) => {
       console.log('Current session:', session)
       if (session) {
-        console.log('User is logged in, redirecting to admin')
-        router.push('/admin')
+        const userRole = (session.user as { role?: string })?.role
+        console.log('User is logged in with role:', userRole)
+        
+        // Only redirect if user has a valid role
+        if (userRole && ['viewer', 'editor', 'admin'].includes(userRole)) {
+          console.log('User has valid role, redirecting to admin')
+          router.push('/admin')
+        } else {
+          console.log('User has no access (role:', userRole, '), staying on login page')
+        }
       } else {
         console.log('No session found')
       }
