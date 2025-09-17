@@ -9,6 +9,10 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
   ],
+  session: {
+    strategy: 'jwt',
+    maxAge: 30 * 60, // 30 minutes - shorter session for fresh role checks
+  },
   callbacks: {
     async session({ session, token }) {
       if (session?.user) {
@@ -82,19 +86,8 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id
         token.email = user.email
-      }
-
-      // Set role in JWT for middleware access
-      const email = (token as { email?: string })?.email as string | undefined
-      if (email && !(token as { role?: string })?.role) {
-        // Only set admin role for specific email, others will be handled by session callback
-        if (email === 'srinii2005@gmail.com') {
-          ;(token as { role?: string }).role = 'admin'
-          console.log('JWT - Set admin role for:', email)
-        } else {
-          // Don't set a default role - let session callback handle it from database
-          console.log('JWT - No role set for:', email, '- will be handled by session callback')
-        }
+        // Don't set role in JWT - always fetch fresh from database in session callback
+        console.log('JWT - User signed in:', user.email, '- role will be fetched from database')
       }
       return token
     },
