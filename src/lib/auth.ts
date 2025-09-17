@@ -26,10 +26,15 @@ export const authOptions: NextAuthOptions = {
         if (email) {
           try {
             // Create Supabase client with service role key for server-side access
-            const supabaseAdmin = createClient(
-              process.env.NEXT_PUBLIC_SUPABASE_URL!,
-              process.env.SUPABASE_SERVICE_ROLE_KEY!
-            )
+            const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+            const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+            
+            if (!supabaseUrl || !serviceRoleKey) {
+              console.warn('Supabase environment variables not configured for auth')
+              return session
+            }
+            
+            const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey)
             
             const { data: userData, error } = await supabaseAdmin
               .from('users')
