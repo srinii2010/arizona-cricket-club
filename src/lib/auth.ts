@@ -31,32 +31,34 @@ export const authOptions: NextAuthOptions = {
             
             if (!supabaseUrl || !serviceRoleKey) {
               console.warn('Supabase environment variables not configured for auth')
-              return session
-            }
-            
-            const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey)
-            
-            const { data: userData, error } = await supabaseAdmin
-              .from('users')
-              .select('role')
-              .eq('email', email)
-              .single()
-            
-            if (error || !userData) {
-              console.log('User not found or error:', email, error?.message)
-              // If no JWT role and no database role, set to unauthorized
-              if (!userRole) {
-                userRole = 'unauthorized'
-                console.log('No role found, setting to unauthorized')
-              }
+              // Set a default role when Supabase is not configured
+              userRole = 'viewer'
+              console.log('Setting default role to viewer due to missing Supabase config')
             } else {
-              // Use database role if available, otherwise keep JWT role
-              if (userData.role) {
-                userRole = userData.role
-                console.log('User role found in database:', email, '->', userData.role)
-              } else if (!userRole) {
-                userRole = 'unauthorized'
-                console.log('No role in database, setting to unauthorized')
+              const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey)
+              
+              const { data: userData, error } = await supabaseAdmin
+                .from('users')
+                .select('role')
+                .eq('email', email)
+                .single()
+              
+              if (error || !userData) {
+                console.log('User not found or error:', email, error?.message)
+                // If no JWT role and no database role, set to unauthorized
+                if (!userRole) {
+                  userRole = 'unauthorized'
+                  console.log('No role found, setting to unauthorized')
+                }
+              } else {
+                // Use database role if available, otherwise keep JWT role
+                if (userData.role) {
+                  userRole = userData.role
+                  console.log('User role found in database:', email, '->', userData.role)
+                } else if (!userRole) {
+                  userRole = 'unauthorized'
+                  console.log('No role in database, setting to unauthorized')
+                }
               }
             }
           } catch (error) {
