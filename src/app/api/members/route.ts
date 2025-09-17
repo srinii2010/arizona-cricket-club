@@ -4,6 +4,10 @@ import { getUserEmailFromRequest } from '@/lib/auth-utils'
 
 // GET /api/members -> list members with team name (supports ?team_id=)
 export async function GET(req: NextRequest) {
+  if (!supabaseAdmin) {
+    return NextResponse.json({ error: 'Database not configured' }, { status: 500 })
+  }
+
   const { searchParams } = new URL(req.url)
   const teamId = searchParams.get('team_id')
 
@@ -28,6 +32,10 @@ export async function GET(req: NextRequest) {
 // POST /api/members -> create a member
 export async function POST(req: NextRequest) {
   try {
+    if (!supabaseAdmin) {
+      return NextResponse.json({ error: 'Database not configured' }, { status: 500 })
+    }
+
     const body = await req.json()
     const userEmail = await getUserEmailFromRequest(req)
 

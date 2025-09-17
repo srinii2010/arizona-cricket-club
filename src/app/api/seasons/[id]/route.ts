@@ -7,6 +7,10 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    if (!supabaseAdmin) {
+      return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
+    }
+
     const { id } = await params;
     const { data: season, error } = await supabaseAdmin
       .from('seasons')
@@ -38,6 +42,10 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    if (!supabaseAdmin) {
+      return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
+    }
+
     const { id } = await params;
     const body = await request.json();
     const userEmail = await getUserEmailFromRequest(request);
@@ -136,6 +144,10 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    if (!supabaseAdmin) {
+      return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
+    }
+
     const { id } = await params;
     // Check if season has any associated data
     const { data: memberDues } = await supabaseAdmin

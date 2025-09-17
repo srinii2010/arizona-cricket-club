@@ -7,6 +7,10 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    if (!supabaseAdmin) {
+      return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
+    }
+
     const { id } = await params;
     const body = await request.json();
     const userEmail = await getUserEmailFromRequest(request);

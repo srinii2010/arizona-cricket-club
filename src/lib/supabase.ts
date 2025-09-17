@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 
 // Avoid throwing at module evaluation time to prevent build-time imports from failing on Vercel.
 if (!supabaseUrl || !supabaseAnonKey) {
@@ -13,6 +13,6 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
-export const supabaseAdmin = supabaseServiceRoleKey
+export const supabaseAdmin = supabaseServiceRoleKey && supabaseUrl
   ? createClient(supabaseUrl, supabaseServiceRoleKey)
   : undefined

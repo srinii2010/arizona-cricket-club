@@ -6,6 +6,10 @@ type RbacRole = 'admin' | 'editor' | 'viewer' | 'none'
 // GET /api/access
 // Returns members with their RBAC role (from users.role). If no users record, role = 'none'.
 export async function GET() {
+  if (!supabaseAdmin) {
+    return NextResponse.json({ error: 'Database not configured' }, { status: 500 })
+  }
+
   // Load members (source of truth for people)
   const { data: members, error: membersError } = await supabaseAdmin
     .from('members')
@@ -47,6 +51,10 @@ export async function GET() {
 // Sets RBAC role for the given email in users table. If 'none', clears role (or removes record if desired).
 export async function POST(req: NextRequest) {
   try {
+    if (!supabaseAdmin) {
+      return NextResponse.json({ error: 'Database not configured' }, { status: 500 })
+    }
+
     const body = await req.json()
     const email = String(body?.email || '').trim().toLowerCase()
     const role: RbacRole = body?.role

@@ -4,6 +4,10 @@ import { getUserEmailFromRequest } from '@/lib/auth-utils'
 
 // GET /api/members/:id -> get single member
 export async function GET(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  if (!supabaseAdmin) {
+    return NextResponse.json({ error: 'Database not configured' }, { status: 500 })
+  }
+
   const { id } = await params
   const { data, error } = await supabaseAdmin
     .from('members')
@@ -19,6 +23,10 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
 // PUT /api/members/:id -> update member
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    if (!supabaseAdmin) {
+      return NextResponse.json({ error: 'Database not configured' }, { status: 500 })
+    }
+
     const { id } = await params
     const body = await req.json()
     const userEmail = await getUserEmailFromRequest(req)
@@ -50,6 +58,10 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
 // DELETE /api/members/:id -> delete member
 export async function DELETE(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  if (!supabaseAdmin) {
+    return NextResponse.json({ error: 'Database not configured' }, { status: 500 })
+  }
+
   const { id } = await params
   const { error } = await supabaseAdmin
     .from('members')
