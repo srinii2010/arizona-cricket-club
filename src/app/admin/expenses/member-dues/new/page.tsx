@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Users } from 'lucide-react';
@@ -59,12 +59,6 @@ export default function NewMemberDuesPage() {
     fetchSeasons();
   }, []);
 
-  useEffect(() => {
-    if (formData.year) {
-      fetchTournamentFormats();
-    }
-  }, [formData.year]);
-
   const fetchMembers = async () => {
     try {
       const response = await fetch('/api/members');
@@ -99,7 +93,7 @@ export default function NewMemberDuesPage() {
     }
   };
 
-  const fetchTournamentFormats = async () => {
+  const fetchTournamentFormats = useCallback(async () => {
     try {
       const response = await fetch(`/api/tournament-formats?season_id=${seasons.find(s => s.year.toString() === formData.year)?.id || ''}`);
       const data = await response.json();
@@ -112,7 +106,13 @@ export default function NewMemberDuesPage() {
     } catch {
       setError('Failed to fetch tournament formats');
     }
-  };
+  }, [seasons, formData.year]);
+
+  useEffect(() => {
+    if (formData.year) {
+      fetchTournamentFormats();
+    }
+  }, [formData.year, fetchTournamentFormats]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -165,6 +165,32 @@ export default function NewMemberDuesPage() {
       });
 
       if (response.ok) {
+        // Send initial notification
+        try {
+          const selectedMember = members.find(m => m.id === formData.member_id);
+          const selectedSeason = seasons.find(s => s.year.toString() === formData.year);
+          
+          if (selectedMember && selectedSeason) {
+            await fetch('/api/notifications/member-dues', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                type: 'initial',
+                memberEmail: selectedMember.email,
+                memberName: `${selectedMember.first_name} ${selectedMember.last_name}`,
+                duesAmount: parseFloat(formData.season_dues),
+                dueDate: formData.due_date,
+                season: `${selectedSeason.year}-${selectedSeason.year + 1}`,
+              }),
+            });
+          }
+        } catch (notificationError) {
+          console.error('Failed to send initial notification:', notificationError);
+          // Don't fail the entire operation if notification fails
+        }
+        
         router.push('/admin/expenses/member-dues');
       } else {
         const data = await response.json();

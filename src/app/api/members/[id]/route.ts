@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { getUserEmailFromRequest } from '@/lib/auth-utils'
+import { runExportOnDataChange } from '@/lib/scheduled-export'
 
 // GET /api/members/:id -> get single member
 export async function GET(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -41,6 +42,9 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
+    // Trigger export on member update (async, don't wait for it)
+    runExportOnDataChange('member').catch(console.error)
+
     return NextResponse.json({ member: data })
   } catch (e: unknown) {
     const errorMessage = e instanceof Error ? e.message : 'Invalid JSON'
@@ -57,6 +61,9 @@ export async function DELETE(_: NextRequest, { params }: { params: Promise<{ id:
     .eq('id', id)
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  // Trigger export on member deletion (async, don't wait for it)
+  runExportOnDataChange('member').catch(console.error)
 
   return NextResponse.json({ ok: true })
 }

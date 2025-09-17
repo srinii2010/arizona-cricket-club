@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Users, Trophy } from 'lucide-react';
@@ -69,12 +69,6 @@ export default function NewGeneralExpensePage() {
     fetchSeasons();
   }, []);
 
-  useEffect(() => {
-    if (formData.year) {
-      fetchTournamentFormats();
-    }
-  }, [formData.year]);
-
   const fetchMembers = async () => {
     try {
       const response = await fetch('/api/members');
@@ -109,7 +103,7 @@ export default function NewGeneralExpensePage() {
     }
   };
 
-  const fetchTournamentFormats = async () => {
+  const fetchTournamentFormats = useCallback(async () => {
     try {
       const response = await fetch(`/api/tournament-formats?season_id=${seasons.find(s => s.year.toString() === formData.year)?.id || ''}`);
       const data = await response.json();
@@ -122,7 +116,13 @@ export default function NewGeneralExpensePage() {
     } catch {
       setError('Failed to fetch tournament formats');
     }
-  };
+  }, [seasons, formData.year]);
+
+  useEffect(() => {
+    if (formData.year) {
+      fetchTournamentFormats();
+    }
+  }, [formData.year, fetchTournamentFormats]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;

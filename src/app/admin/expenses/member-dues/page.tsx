@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Plus, DollarSign, CheckCircle, XCircle } from 'lucide-react';
+import { ArrowLeft, Plus, DollarSign, CheckCircle, XCircle, Send } from 'lucide-react';
 
 interface MemberDue {
   id: string;
@@ -27,15 +27,50 @@ interface MemberDue {
   };
 }
 
+interface Season {
+  id: string;
+  year: number;
+  name: string;
+  status: 'Active' | 'Inactive';
+  created_at: string;
+}
+
 export default function MemberDuesPage() {
   const [dues, setDues] = useState<MemberDue[]>([]);
+  const [seasons, setSeasons] = useState<Season[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [totals, setTotals] = useState<{ total_dues: number; paid_dues: number; pending_dues: number }>({ total_dues: 0, paid_dues: 0, pending_dues: 0 });
+  const [sendingNotification, setSendingNotification] = useState<string | null>(null);
+
+  const fetchSeasons = useCallback(async () => {
+    try {
+      const response = await fetch('/api/seasons');
+      const data = await response.json();
+      
+      if (response.ok) {
+        setSeasons(data.seasons || []);
+        // Set the first available season as selected if none is selected
+        if (data.seasons && data.seasons.length > 0 && selectedYear === null) {
+          setSelectedYear(data.seasons[0].year);
+        }
+      } else {
+        setError(data.error || 'Failed to fetch seasons');
+      }
+    } catch {
+      setError('Failed to fetch seasons');
+    }
+  }, [selectedYear]);
 
   const fetchDues = useCallback(async () => {
+    if (selectedYear === null) {
+      setDues([]);
+      setTotals({ total_dues: 0, paid_dues: 0, pending_dues: 0 });
+      return;
+    }
+
     try {
       setLoading(true);
       const params = new URLSearchParams();
@@ -61,6 +96,10 @@ export default function MemberDuesPage() {
   }, [selectedYear, filterStatus]);
 
   useEffect(() => {
+    fetchSeasons();
+  }, [fetchSeasons]);
+
+  useEffect(() => {
     fetchDues();
   }, [fetchDues]);
 
@@ -84,6 +123,45 @@ export default function MemberDuesPage() {
       }
     } catch {
       alert('Failed to settle dues');
+    }
+  };
+
+  const handleSendNotification = async (due: MemberDue, type: 'initial' | 'reminder') => {
+    try {
+      setSendingNotification(due.id);
+      
+      const daysOverdue = type === 'reminder' ? 
+        Math.max(0, Math.ceil((new Date().getTime() - new Date(due.due_date).getTime()) / (1000 * 60 * 60 * 24))) : 
+        undefined;
+
+      const response = await fetch('/api/notifications/member-dues', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type,
+          memberDueId: due.id,
+          memberEmail: due.members.email,
+          memberName: `${due.members.first_name} ${due.members.last_name}`,
+          duesAmount: due.total_dues,
+          dueDate: due.due_date,
+          season: formatSeason(due.year),
+          daysOverdue,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert(`Notification sent successfully to ${due.members.email}`);
+      } else {
+        alert(data.error || 'Failed to send notification');
+      }
+    } catch {
+      alert('Failed to send notification');
+    } finally {
+      setSendingNotification(null);
     }
   };
 
@@ -174,13 +252,16 @@ export default function MemberDuesPage() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Season (Year)</label>
               <select
-                value={selectedYear}
-                onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+                value={selectedYear || ''}
+                onChange={(e) => setSelectedYear(e.target.value ? parseInt(e.target.value) : null)}
                 className="border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
               >
-                <option value={2024}>{formatSeason(2024)}</option>
-                <option value={2025}>{formatSeason(2025)}</option>
-                <option value={2026}>{formatSeason(2026)}</option>
+                <option value="">Select a season</option>
+                {seasons.map((season) => (
+                  <option key={season.id} value={season.year}>
+                    {formatSeason(season.year)} {season.status === 'Inactive' ? '(Inactive)' : ''}
+                  </option>
+                ))}
               </select>
             </div>
             <div>
@@ -228,7 +309,27 @@ export default function MemberDuesPage() {
           </div>
         )}
 
-        {dues.length === 0 ? (
+        {!selectedYear ? (
+          <div className="bg-white shadow rounded-lg p-6 text-center">
+            <div className="text-gray-500">
+              <DollarSign className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Select a season</h3>
+              <p className="mb-4">Please select a season from the dropdown above to view member dues.</p>
+              {seasons.length === 0 && (
+                <div className="mt-4">
+                  <p className="text-sm text-gray-600 mb-4">No seasons found. Create a season first.</p>
+                  <Link
+                    href="/admin/seasons/new"
+                    className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
+                  >
+                    <Plus className="h-5 w-5 mr-2" />
+                    Create Season
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+        ) : dues.length === 0 ? (
           <div className="bg-white shadow rounded-lg p-6 text-center">
             <div className="text-gray-500">
               <DollarSign className="h-12 w-12 mx-auto mb-4 text-gray-400" />
@@ -274,6 +375,9 @@ export default function MemberDuesPage() {
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Actions
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Notifications
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Created By
@@ -328,6 +432,22 @@ export default function MemberDuesPage() {
                           <span className="text-gray-500">
                             Settled {formatDate(due.settlement_date)}
                           </span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={() => handleSendNotification(due, 'reminder')}
+                            disabled={sendingNotification === due.id}
+                            className="inline-flex items-center px-2 py-1 text-xs font-medium text-orange-600 hover:text-orange-900 disabled:opacity-50"
+                            title="Send reminder notification"
+                          >
+                            <Send className="h-4 w-4 mr-1" />
+                            Reminder
+                          </button>
+                        </div>
+                        {sendingNotification === due.id && (
+                          <div className="text-xs text-gray-500 mt-1">Sending...</div>
                         )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">

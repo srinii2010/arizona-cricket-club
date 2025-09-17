@@ -3,19 +3,61 @@
 import { useSession } from 'next-auth/react'
 import { signOut } from 'next-auth/react'
 import Link from 'next/link'
-import { Users, DollarSign, Calendar, Settings, LogOut, Trophy, Eye, Edit, Shield } from 'lucide-react'
+import { useState } from 'react'
+import { Users, DollarSign, Calendar, Settings, LogOut, Trophy, Eye, Edit, Shield, Download, FileSpreadsheet } from 'lucide-react'
 import { getUserPermissions, UserRole } from '@/lib/permissions'
 import AdminGuard from '@/components/AdminGuard'
 
 export default function AdminDashboard() {
   const { data: session, status } = useSession()
   const user = session?.user
+  const [exporting, setExporting] = useState(false)
+  const [exportMessage, setExportMessage] = useState('')
 
   console.log('AdminDashboard - Session:', session)
   console.log('AdminDashboard - User:', user)
 
   const handleLogout = async () => {
     await signOut({ callbackUrl: '/' })
+  }
+
+  const handleExportData = async () => {
+    try {
+      setExporting(true)
+      setExportMessage('')
+      
+      const response = await fetch('/api/export/download', {
+        method: 'GET',
+      })
+
+      if (response.ok) {
+        // Get the filename from the Content-Disposition header
+        const contentDisposition = response.headers.get('Content-Disposition')
+        const filename = contentDisposition
+          ? contentDisposition.split('filename=')[1].replace(/"/g, '')
+          : 'Arizona_Cricket_Club_Export.xlsx'
+
+        // Create blob and download
+        const blob = await response.blob()
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = filename
+        document.body.appendChild(a)
+        a.click()
+        window.URL.revokeObjectURL(url)
+        document.body.removeChild(a)
+
+        setExportMessage(`Export completed successfully! File downloaded: ${filename}`)
+      } else {
+        const data = await response.json()
+        setExportMessage(`Export failed: ${data.error}`)
+      }
+    } catch (error) {
+      setExportMessage(`Export failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    } finally {
+      setExporting(false)
+    }
   }
 
   // Show loading while session is being fetched
@@ -169,6 +211,51 @@ export default function AdminDashboard() {
             </Link>
           )}
         </div>
+
+        {/* Data Export Section */}
+        {permissions.canView && (
+          <div className="mt-8">
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-medium text-gray-900 flex items-center">
+                    <FileSpreadsheet className="h-5 w-5 mr-2 text-green-600" />
+                    Data Export
+                  </h3>
+                  <p className="mt-1 text-sm text-gray-600">
+                    Export all member, dues, and expense data to Excel. File will be downloaded directly to your system.
+                  </p>
+                </div>
+                <button
+                  onClick={handleExportData}
+                  disabled={exporting}
+                  className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
+                >
+                  {exporting ? (
+                    <>
+                      <div className="animate-spin h-4 w-4 mr-2 border-2 border-white border-t-transparent rounded-full"></div>
+                      Exporting...
+                    </>
+                  ) : (
+                    <>
+                      <Download className="h-4 w-4 mr-2" />
+                      Export Data
+                    </>
+                  )}
+                </button>
+              </div>
+              {exportMessage && (
+                <div className={`mt-4 p-3 rounded-md ${
+                  exportMessage.includes('successfully') 
+                    ? 'bg-green-50 text-green-700' 
+                    : 'bg-red-50 text-red-700'
+                }`}>
+                  {exportMessage}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Show message if user has no permissions */}
         {!permissions.canView && (
