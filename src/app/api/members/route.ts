@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { getUserEmailFromRequest } from '@/lib/auth-utils'
-import { runExportOnDataChange } from '@/lib/scheduled-export'
 
 // GET /api/members -> list members with team name (supports ?team_id=)
 export async function GET(req: NextRequest) {
@@ -61,9 +60,6 @@ export async function POST(req: NextRequest) {
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
-
-    // Trigger export on member creation (async, don't wait for it)
-    runExportOnDataChange('member').catch(console.error)
 
     return NextResponse.json({ member: data }, { status: 201 })
   } catch (e: unknown) {

@@ -64,11 +64,6 @@ export default function NewGeneralExpensePage() {
 
   const formatSeason = (startYear: number) => `${startYear}-${startYear + 1}`;
 
-  useEffect(() => {
-    fetchMembers();
-    fetchSeasons();
-  }, []);
-
   const fetchMembers = async () => {
     try {
       const response = await fetch('/api/members');
@@ -117,6 +112,11 @@ export default function NewGeneralExpensePage() {
       setError('Failed to fetch tournament formats');
     }
   }, [seasons, formData.year]);
+
+  useEffect(() => {
+    fetchMembers();
+    fetchSeasons();
+  }, []);
 
   useEffect(() => {
     if (formData.year) {

@@ -28,21 +28,12 @@ interface GeneralExpense {
   };
 }
 
-interface Season {
-  id: string;
-  year: number;
-  name: string;
-  status: 'Active' | 'Inactive';
-  created_at: string;
-}
-
 export default function GeneralExpensesPage() {
   const [expenses, setExpenses] = useState<GeneralExpense[]>([]);
-  const [seasons, setSeasons] = useState<Season[]>([]);
   const [totals, setTotals] = useState<{ total_amount: number; settled_amount: number; pending_amount: number }>({ total_amount: 0, settled_amount: 0, pending_amount: 0 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedYear, setSelectedYear] = useState<number | null>(null);
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const formatSeason = (startYear: number) => `${startYear}-${startYear + 1}`;
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
@@ -57,32 +48,7 @@ export default function GeneralExpensesPage() {
     'Others'
   ];
 
-  const fetchSeasons = useCallback(async () => {
-    try {
-      const response = await fetch('/api/seasons');
-      const data = await response.json();
-      
-      if (response.ok) {
-        setSeasons(data.seasons || []);
-        // Set the first available season as selected if none is selected
-        if (data.seasons && data.seasons.length > 0 && selectedYear === null) {
-          setSelectedYear(data.seasons[0].year);
-        }
-      } else {
-        setError(data.error || 'Failed to fetch seasons');
-      }
-    } catch {
-      setError('Failed to fetch seasons');
-    }
-  }, [selectedYear]);
-
   const fetchExpenses = useCallback(async () => {
-    if (selectedYear === null) {
-      setExpenses([]);
-      setTotals({ total_amount: 0, settled_amount: 0, pending_amount: 0 });
-      return;
-    }
-
     try {
       setLoading(true);
       const params = new URLSearchParams();
@@ -109,10 +75,6 @@ export default function GeneralExpensesPage() {
       setLoading(false);
     }
   }, [selectedYear, filterCategory, filterStatus]);
-
-  useEffect(() => {
-    fetchSeasons();
-  }, [fetchSeasons]);
 
   useEffect(() => {
     fetchExpenses();
@@ -239,16 +201,13 @@ export default function GeneralExpensesPage() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Season (Year)</label>
               <select
-                value={selectedYear || ''}
-                onChange={(e) => setSelectedYear(e.target.value ? parseInt(e.target.value) : null)}
+                value={selectedYear}
+                onChange={(e) => setSelectedYear(parseInt(e.target.value))}
                 className="border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500"
               >
-                <option value="">Select a season</option>
-                {seasons.map((season) => (
-                  <option key={season.id} value={season.year}>
-                    {formatSeason(season.year)} {season.status === 'Inactive' ? '(Inactive)' : ''}
-                  </option>
-                ))}
+                <option value={2024}>{formatSeason(2024)}</option>
+                <option value={2025}>{formatSeason(2025)}</option>
+                <option value={2026}>{formatSeason(2026)}</option>
               </select>
             </div>
             <div>
@@ -309,27 +268,7 @@ export default function GeneralExpensesPage() {
           </div>
         )}
 
-        {!selectedYear ? (
-          <div className="bg-white shadow rounded-lg p-6 text-center">
-            <div className="text-gray-500">
-              <Receipt className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Select a season</h3>
-              <p className="mb-4">Please select a season from the dropdown above to view general expenses.</p>
-              {seasons.length === 0 && (
-                <div className="mt-4">
-                  <p className="text-sm text-gray-600 mb-4">No seasons found. Create a season first.</p>
-                  <Link
-                    href="/admin/seasons/new"
-                    className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
-                  >
-                    <Plus className="h-5 w-5 mr-2" />
-                    Create Season
-                  </Link>
-                </div>
-              )}
-            </div>
-          </div>
-        ) : expenses.length === 0 ? (
+        {expenses.length === 0 ? (
           <div className="bg-white shadow rounded-lg p-6 text-center">
             <div className="text-gray-500">
               <Receipt className="h-12 w-12 mx-auto mb-4 text-gray-400" />

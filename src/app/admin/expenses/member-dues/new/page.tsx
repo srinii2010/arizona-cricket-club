@@ -54,11 +54,6 @@ export default function NewMemberDuesPage() {
 
   const formatSeason = (startYear: number) => `${startYear}-${startYear + 1}`;
 
-  useEffect(() => {
-    fetchMembers();
-    fetchSeasons();
-  }, []);
-
   const fetchMembers = async () => {
     try {
       const response = await fetch('/api/members');
@@ -107,6 +102,11 @@ export default function NewMemberDuesPage() {
       setError('Failed to fetch tournament formats');
     }
   }, [seasons, formData.year]);
+
+  useEffect(() => {
+    fetchMembers();
+    fetchSeasons();
+  }, []);
 
   useEffect(() => {
     if (formData.year) {
@@ -165,32 +165,6 @@ export default function NewMemberDuesPage() {
       });
 
       if (response.ok) {
-        // Send initial notification
-        try {
-          const selectedMember = members.find(m => m.id === formData.member_id);
-          const selectedSeason = seasons.find(s => s.year.toString() === formData.year);
-          
-          if (selectedMember && selectedSeason) {
-            await fetch('/api/notifications/member-dues', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                type: 'initial',
-                memberEmail: selectedMember.email,
-                memberName: `${selectedMember.first_name} ${selectedMember.last_name}`,
-                duesAmount: parseFloat(formData.season_dues),
-                dueDate: formData.due_date,
-                season: `${selectedSeason.year}-${selectedSeason.year + 1}`,
-              }),
-            });
-          }
-        } catch (notificationError) {
-          console.error('Failed to send initial notification:', notificationError);
-          // Don't fail the entire operation if notification fails
-        }
-        
         router.push('/admin/expenses/member-dues');
       } else {
         const data = await response.json();

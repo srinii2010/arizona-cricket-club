@@ -1,52 +1,41 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { sendEmail, generateMemberDuesNotificationEmail, generateMemberDuesReminderEmail } from '@/lib/email';
+
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const memberId = searchParams.get('memberId');
+    
+    // This is a placeholder for member dues notifications
+    // In a real implementation, this would fetch notification data
+    return NextResponse.json({ 
+      message: 'Member dues notifications endpoint',
+      memberId,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Member dues notifications failed:', error);
+    return NextResponse.json(
+      { error: 'Member dues notifications failed' },
+      { status: 500 }
+    );
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
-    const { type, memberEmail, memberName, duesAmount, dueDate, season, daysOverdue } = await request.json();
-
-    if (!memberEmail || !memberName || !duesAmount || !dueDate || !season) {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
-      );
-    }
-
-    let emailData;
+    const body = await request.json();
     
-    if (type === 'initial') {
-      emailData = generateMemberDuesNotificationEmail(memberName, duesAmount, dueDate, season);
-    } else if (type === 'reminder') {
-      emailData = generateMemberDuesReminderEmail(memberName, duesAmount, dueDate, season, daysOverdue);
-    } else {
-      return NextResponse.json(
-        { error: 'Invalid notification type' },
-        { status: 400 }
-      );
-    }
-
-    const result = await sendEmail({
-      to: memberEmail,
-      subject: emailData.subject,
-      html: emailData.html,
+    // This is a placeholder for creating member dues notifications
+    // In a real implementation, this would process the notification request
+    return NextResponse.json({ 
+      message: 'Member dues notification created',
+      data: body,
+      timestamp: new Date().toISOString()
     });
-
-    if (result.success) {
-      return NextResponse.json({
-        success: true,
-        message: 'Notification sent successfully',
-        messageId: result.messageId,
-      });
-    } else {
-      return NextResponse.json(
-        { error: 'Failed to send notification', details: result.error },
-        { status: 500 }
-      );
-    }
   } catch (error) {
-    console.error('Error sending member dues notification:', error);
+    console.error('Member dues notification creation failed:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Member dues notification creation failed' },
       { status: 500 }
     );
   }
