@@ -85,6 +85,16 @@ export default function MembersPage() {
     }
   }
 
+  // Role priority for ordering (Admin → Editor → Viewer → None)
+  const getRolePriority = (role: string) => {
+    switch (role.toLowerCase()) {
+      case 'admin': return 1
+      case 'editor': return 2
+      case 'viewer': return 3
+      default: return 4
+    }
+  }
+
   const filteredMembers = members.filter(member => {
     const matchesSearch = 
       member.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -96,6 +106,16 @@ export default function MembersPage() {
     const matchesRole = !filterRole || member.role === filterRole
 
     return matchesSearch && matchesTeam && matchesRole
+  }).sort((a, b) => {
+    // First sort by role priority
+    const roleComparison = getRolePriority(a.role) - getRolePriority(b.role)
+    if (roleComparison !== 0) return roleComparison
+    
+    // Then sort by last name, then first name
+    const lastNameComparison = a.last_name.localeCompare(b.last_name)
+    if (lastNameComparison !== 0) return lastNameComparison
+    
+    return a.first_name.localeCompare(b.first_name)
   })
 
   if (!user) {

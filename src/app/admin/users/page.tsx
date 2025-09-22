@@ -53,6 +53,26 @@ export default function UsersPage() {
     }
   }
 
+  // Role priority for ordering (Admin → Editor → Viewer → None)
+  const getRolePriority = (role: string) => {
+    switch (role.toLowerCase()) {
+      case 'admin': return 1
+      case 'editor': return 2
+      case 'viewer': return 3
+      default: return 4
+    }
+  }
+
+  // Sort users by role priority, then by name
+  const sortedUserRoles = userRoles.sort((a, b) => {
+    // First sort by role priority
+    const roleComparison = getRolePriority(a.rbac_role) - getRolePriority(b.rbac_role)
+    if (roleComparison !== 0) return roleComparison
+    
+    // Then sort by name
+    return a.name.localeCompare(b.name)
+  })
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -101,7 +121,7 @@ export default function UsersPage() {
         {/* Access Roles Table */}
         <div className="bg-white shadow-lg rounded-lg overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-medium text-gray-900">Access Assignments ({userRoles.length})</h2>
+            <h2 className="text-lg font-medium text-gray-900">Access Assignments ({sortedUserRoles.length})</h2>
             <p className="text-sm text-gray-600 mt-1">
               Assign admin/editor/viewer console access to members
             </p>
@@ -129,7 +149,7 @@ export default function UsersPage() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {userRoles.map((userRole) => (
+                {sortedUserRoles.map((userRole) => (
                   <tr key={userRole.member_id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">

@@ -171,7 +171,7 @@ export default function SeasonsPage() {
           </div>
         )}
 
-        {seasons.length === 0 ? (
+        {!seasons || seasons.length === 0 ? (
           <div className="bg-white shadow rounded-lg p-6 text-center">
             <div className="text-gray-500">
               <h3 className="text-lg font-medium text-gray-900 mb-2">No seasons found</h3>
@@ -191,7 +191,7 @@ export default function SeasonsPage() {
               <h3 className="text-lg font-medium text-gray-900">Seasons</h3>
             </div>
             <div className="divide-y divide-gray-200">
-              {seasons.map((season) => (
+              {seasons?.map((season) => (
                 <div key={season.id} className="px-6 py-4 hover:bg-gray-50">
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
@@ -208,16 +208,16 @@ export default function SeasonsPage() {
                         </span>
                       </div>
                       <p className="mt-1 text-sm text-gray-600">
-                        {season.tournament_formats.length} tournament format{season.tournament_formats.length !== 1 ? 's' : ''}
+                        {season.tournament_formats?.length || 0} tournament format{(season.tournament_formats?.length || 0) !== 1 ? 's' : ''}
                       </p>
                       <div className="mt-2 text-xs text-gray-500">
                         <div>Created by: {(season as unknown as { created_by?: string }).created_by || 'N/A'}</div>
                         <div>Last updated by: {(season as unknown as { last_updated_by?: string }).last_updated_by || 'N/A'}</div>
                       </div>
-                      {season.tournament_formats.length > 0 && (
+                      {(season.tournament_formats?.length || 0) > 0 && (
                         <div className="mt-2">
                           <div className="flex flex-wrap gap-2">
-                            {season.tournament_formats.map((format) => (
+                            {season.tournament_formats?.map((format) => (
                               <span
                                 key={format.id}
                                 className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"

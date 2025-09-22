@@ -3,7 +3,7 @@
 import { useSession } from 'next-auth/react'
 import { signOut } from 'next-auth/react'
 import Link from 'next/link'
-import { Users, DollarSign, Calendar, Settings, LogOut, Trophy, Eye, Edit, Shield } from 'lucide-react'
+import { Users, DollarSign, Calendar, Settings, LogOut, Trophy, Eye, Edit, Shield, Clock } from 'lucide-react'
 import { getUserPermissions, UserRole } from '@/lib/permissions'
 import AdminGuard from '@/components/AdminGuard'
 
@@ -149,6 +149,21 @@ export default function AdminDashboard() {
                 </div>
                 <p className="mt-2 text-sm text-gray-600">
                   {permissions.canCreate ? 'Manage teams and team assignments.' : 'View teams and team assignments.'}
+                </p>
+              </div>
+            </Link>
+          )}
+
+          {/* Schedule Management */}
+          {permissions.canManageSchedule && (
+            <Link href="/admin/schedule" className="group">
+              <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+                <div className="flex items-center">
+                  <Clock className="h-8 w-8 text-indigo-600" />
+                  <h3 className="ml-3 text-lg font-medium text-gray-900">Schedule Management</h3>
+                </div>
+                <p className="mt-2 text-sm text-gray-600">
+                  {permissions.canCreate ? 'Manage match schedules.' : 'View match schedules.'}
                 </p>
               </div>
             </Link>

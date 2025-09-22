@@ -17,10 +17,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#0f172a" />
+      </head>
       <body className={inter.className}>
         <Providers>
           {children}
         </Providers>
+        {/* SW registration deferred until we finalize PWA path */}
       </body>
     </html>
   )

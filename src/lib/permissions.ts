@@ -13,6 +13,7 @@ export interface UserPermissions {
   canManageMembers: boolean
   canManageTeams: boolean
   canManageSeasons: boolean
+  canManageSchedule: boolean
 }
 
 export function getUserPermissions(role: UserRole): UserPermissions {
@@ -28,6 +29,7 @@ export function getUserPermissions(role: UserRole): UserPermissions {
         canManageMembers: true,
         canManageTeams: true,
         canManageSeasons: true,
+        canManageSchedule: true,
       }
     case 'editor':
       return {
@@ -40,6 +42,7 @@ export function getUserPermissions(role: UserRole): UserPermissions {
         canManageMembers: true,
         canManageTeams: true,
         canManageSeasons: true,
+        canManageSchedule: true,
       }
     case 'viewer':
       return {
@@ -52,6 +55,7 @@ export function getUserPermissions(role: UserRole): UserPermissions {
         canManageMembers: true, // Viewers can view members
         canManageTeams: true, // Viewers can view teams
         canManageSeasons: true, // Viewers can view seasons
+        canManageSchedule: true, // Viewers can view schedule
       }
     default:
       return {
@@ -64,6 +68,7 @@ export function getUserPermissions(role: UserRole): UserPermissions {
         canManageMembers: false,
         canManageTeams: false,
         canManageSeasons: false,
+        canManageSchedule: false,
       }
   }
 }
