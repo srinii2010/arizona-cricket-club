@@ -6,7 +6,6 @@
       "use": "@vercel/next"
     }
   ],
-  "buildCommand": "npm run build",
   "installCommand": "npm ci",
   "framework": "nextjs",
   "env": {
