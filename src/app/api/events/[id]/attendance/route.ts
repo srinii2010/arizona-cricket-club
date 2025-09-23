@@ -58,6 +58,14 @@ export async function POST(
       return NextResponse.json({ error: 'Member not found' }, { status: 404 })
     }
 
+    // Get current RSVP status before updating
+    const { data: currentRsvp } = await supabaseAdmin
+      .from('rsvps')
+      .select('status')
+      .eq('event_id', id)
+      .eq('member_id', member.id)
+      .single()
+
     const { data, error } = await supabaseAdmin
       .from('rsvps')
       .upsert({
@@ -72,6 +80,26 @@ export async function POST(
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
+
+    // Send notification to team admins if status changed
+    if (currentRsvp?.status !== status) {
+      try {
+        await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/notifications/rsvp-change`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            eventId: id,
+            memberId: member.id,
+            oldStatus: currentRsvp?.status || null,
+            newStatus: status
+          })
+        })
+      } catch (notificationError) {
+        console.error('Failed to send notification:', notificationError)
+        // Don't fail the RSVP update if notification fails
+      }
+    }
+
     return NextResponse.json({ rsvp: data }, { status: 201 })
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Unknown error'

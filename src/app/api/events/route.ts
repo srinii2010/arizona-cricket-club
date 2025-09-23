@@ -30,9 +30,8 @@ export async function GET(request: Request) {
     }
 
     if (format) {
-      // Note: Format filtering would require joining with tournament_formats table
-      // For now, we'll skip format filtering in the API
-      console.log('Format filtering not implemented yet')
+      // Filter by tournament format name
+      query = query.eq('tournament_formats.name', format)
     }
 
     const { data, error } = await query

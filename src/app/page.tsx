@@ -43,6 +43,7 @@ export default function Home() {
                 <a href="#" className="text-white hover:text-yellow-400 font-medium text-sm uppercase tracking-wide">SPONSORS</a>
                 <a href="#" className="text-white hover:text-yellow-400 font-medium text-sm uppercase tracking-wide">CALENDAR</a>
                 <a href="#" className="text-white hover:text-yellow-400 font-medium text-sm uppercase tracking-wide">VIDEO ARCHIVES</a>
+                <a href="/member/login" className="text-white hover:text-yellow-400 font-medium text-sm uppercase tracking-wide">MEMBER CONSOLE</a>
                 <a href="/admin/login" className="text-white hover:text-yellow-400 font-medium text-sm uppercase tracking-wide">ADMIN</a>
               </nav>
               <a href="/join" className="bg-yellow-400 text-black px-6 py-2 rounded-md text-sm font-bold uppercase tracking-wide hover:bg-yellow-500 transition-colors">
@@ -77,6 +78,7 @@ export default function Home() {
               <a href="#" className="text-white hover:text-yellow-400 font-medium text-sm uppercase tracking-wide py-2">SPONSORS</a>
               <a href="#" className="text-white hover:text-yellow-400 font-medium text-sm uppercase tracking-wide py-2">CALENDAR</a>
               <a href="#" className="text-white hover:text-yellow-400 font-medium text-sm uppercase tracking-wide py-2">VIDEO ARCHIVES</a>
+              <a href="/member/login" className="text-white hover:text-yellow-400 font-medium text-sm py-2">MEMBER CONSOLE</a>
               <a href="/admin/login" className="text-white hover:text-yellow-400 font-medium text-sm py-2">ADMIN CONSOLE</a>
               <a href="/join" className="bg-yellow-400 text-black px-6 py-2 rounded-md text-sm font-bold uppercase tracking-wide hover:bg-yellow-500 transition-colors w-fit mt-2">
                 JOIN ACC

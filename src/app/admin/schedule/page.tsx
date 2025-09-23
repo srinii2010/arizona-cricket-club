@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import AdminGuard from '@/components/AdminGuard'
 import { getUserPermissions, UserRole, UserPermissions } from '@/lib/permissions'
-import { Clock, Plus, Edit, Trash2, Calendar, Users, Trophy } from 'lucide-react'
+import { Clock, Plus, Edit, Trash2, Calendar, Users, Trophy, Copy } from 'lucide-react'
 import DateTimePicker from '@/components/DateTimePicker'
 
 type Team = {
@@ -153,12 +153,18 @@ export default function ScheduleManagementPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(eventData),
       })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Failed to create event')
       
+      if (!res.ok) {
+        const errorText = await res.text()
+        console.error('API Error Response:', errorText)
+        throw new Error(`HTTP ${res.status}: ${errorText}`)
+      }
+      
+      const data = await res.json()
       setEvents(prev => [data.event, ...prev])
       setShowCreateForm(false)
     } catch (e: unknown) {
+      console.error('Create event error:', e)
       setError(e instanceof Error ? e.message : 'Failed to create event')
     }
   }
@@ -170,12 +176,18 @@ export default function ScheduleManagementPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(eventData),
       })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Failed to update event')
       
+      if (!res.ok) {
+        const errorText = await res.text()
+        console.error('API Error Response:', errorText)
+        throw new Error(`HTTP ${res.status}: ${errorText}`)
+      }
+      
+      const data = await res.json()
       setEvents(prev => prev.map(e => e.id === id ? data.event : e))
       setEditingEvent(null)
     } catch (e: unknown) {
+      console.error('Update event error:', e)
       setError(e instanceof Error ? e.message : 'Failed to update event')
     }
   }
@@ -203,6 +215,43 @@ export default function ScheduleManagementPage() {
       setEvents(prev => prev.filter(e => e.id !== id))
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Failed to delete event')
+    }
+  }
+
+  const handleCopyEvent = (event: ScheduleEvent) => {
+    // Create a copy of the event with a new title and clear the ID
+    const copiedEvent = {
+      ...event,
+      id: '', // Clear the ID so it creates a new event
+      title: `${event.title} (Copy)`, // Add (Copy) to the title
+    }
+    
+    // Set the copied event for creating (not editing)
+    setShowCreateForm(true)
+    setEditingEvent(copiedEvent)
+  }
+
+  const handleCreateCopiedEvent = async (eventData: Partial<ScheduleEvent>) => {
+    try {
+      const res = await fetch('/api/events', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(eventData),
+      })
+      
+      if (!res.ok) {
+        const errorText = await res.text()
+        console.error('API Error Response:', errorText)
+        throw new Error(`HTTP ${res.status}: ${errorText}`)
+      }
+      
+      const data = await res.json()
+      setEvents(prev => [data.event, ...prev])
+      setShowCreateForm(false)
+      setEditingEvent(null)
+    } catch (e: unknown) {
+      console.error('Create copied event error:', e)
+      setError(e instanceof Error ? e.message : 'Failed to create copied event')
     }
   }
 
@@ -274,12 +323,16 @@ export default function ScheduleManagementPage() {
             teams={teams}
             seasons={seasons}
             formats={formats}
-            onSubmit={handleCreateEvent}
-            onCancel={() => setShowCreateForm(false)}
+            event={editingEvent}
+            onSubmit={editingEvent ? handleCreateCopiedEvent : handleCreateEvent}
+            onCancel={() => {
+              setShowCreateForm(false)
+              setEditingEvent(null)
+            }}
           />
         )}
 
-        {permissions.canEdit && editingEvent && (
+        {permissions.canEdit && editingEvent && editingEvent.id && (
           <EventForm
             teams={teams}
             seasons={seasons}
@@ -394,6 +447,7 @@ export default function ScheduleManagementPage() {
                         permissions={permissions}
                         onEdit={handleEditEvent}
                         onDelete={handleDeleteEvent}
+                        onCopy={handleCopyEvent}
                       />
                     ))}
                   </div>
@@ -412,12 +466,14 @@ function EventCard({
   event, 
   permissions,
   onEdit, 
-  onDelete 
+  onDelete,
+  onCopy
 }: { 
   event: ScheduleEvent
   permissions: UserPermissions
   onEdit: (event: ScheduleEvent) => void
   onDelete: (id: string) => void
+  onCopy: (event: ScheduleEvent) => void
 }) {
   return (
     <div className="border rounded-lg p-4 hover:shadow-md transition-shadow">
@@ -464,6 +520,15 @@ function EventCard({
         </div>
         {(permissions.canEdit || permissions.canDelete) && (
           <div className="flex gap-2 ml-4">
+            {permissions.canEdit && (
+              <button
+                onClick={() => onCopy(event)}
+                className="p-2 text-gray-600 hover:text-green-600"
+                title="Copy Event"
+              >
+                <Copy className="h-4 w-4" />
+              </button>
+            )}
             {permissions.canEdit && (
               <button
                 onClick={() => onEdit(event)}
