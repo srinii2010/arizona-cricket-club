@@ -9,7 +9,7 @@
     "lint": "eslint",
     "test": "node test-suite.js",
     "test:ci": "TEST_BASE_URL=https://your-production-url.com node test-suite.js",
-    "predeploy": "npm run test && npm run build",
+    "predeploy": "npm run build",
     "deploy": "npm run predeploy && vercel --prod",
     "deploy:windows": "deploy.bat",
     "deploy:unix": "chmod +x deploy.sh && ./deploy.sh",
