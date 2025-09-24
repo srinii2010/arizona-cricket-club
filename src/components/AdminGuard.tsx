@@ -16,28 +16,35 @@ export default function AdminGuard({ children, requiredRole = 'viewer' }: AdminG
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    if (status === 'loading') return // Still loading
+    console.log('AdminGuard - Session changed:', { status, session: session?.user })
+    
+    if (status === 'loading') {
+      console.log('AdminGuard - Still loading...')
+      return // Still loading
+    }
 
     if (status === 'unauthenticated') {
+      console.log('AdminGuard - Unauthenticated, redirecting to login')
       router.push('/admin/login')
       return
     }
 
-    // Wait for session to be fully established with user data
-    if (status === 'authenticated' && !session?.user?.email) {
-      console.log('AdminGuard - Session authenticated but user data not ready yet')
-      return
-    }
+    if (status === 'authenticated') {
+      // Reset authorization state when session changes
+      setIsAuthorized(false)
+      
+      if (!session?.user?.email) {
+        console.log('AdminGuard - Session authenticated but user data not ready yet')
+        return
+      }
 
-    // Wait for session to be fully established with role data
-    if (status === 'authenticated' && session?.user?.email && !(session.user as { role?: string })?.role) {
-      console.log('AdminGuard - Session authenticated but role data not ready yet')
-      return
-    }
-
-    if (session?.user?.email) {
       const userRole = (session.user as { role?: string })?.role
       console.log('AdminGuard - User role:', userRole, 'Required role:', requiredRole)
+      
+      if (!userRole) {
+        console.log('AdminGuard - Session authenticated but role data not ready yet')
+        return
+      }
       
       // Check if user has required role
       const roleHierarchy = { viewer: 1, editor: 2, admin: 3 }
@@ -47,15 +54,13 @@ export default function AdminGuard({ children, requiredRole = 'viewer' }: AdminG
       console.log('AdminGuard - User level:', userLevel, 'Required level:', requiredLevel)
 
       if (userLevel >= requiredLevel) {
-        console.log('AdminGuard - User authorized')
+        console.log('AdminGuard - User authorized!')
         setIsAuthorized(true)
         setIsLoading(false)
       } else {
         console.log('AdminGuard - User not authorized, redirecting to unauthorized')
         router.push('/admin/unauthorized')
       }
-    } else {
-      setIsLoading(false)
     }
   }, [session, status, requiredRole, router])
 
