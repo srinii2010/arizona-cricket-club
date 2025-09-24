@@ -1,6 +1,6 @@
 'use client'
 
-import { useSession } from 'next-auth/react'
+import { useSession, getSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
@@ -15,22 +15,18 @@ export default function AdminGuard({ children, requiredRole = 'viewer' }: AdminG
   const [isAuthorized, setIsAuthorized] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
 
+  // Force session refresh to bypass Vercel caching
   useEffect(() => {
-    console.log('🛡️ AdminGuard - Session changed at:', new Date().toISOString(), { 
-      status, 
-      hasUser: !!session?.user, 
-      hasEmail: !!session?.user?.email,
-      hasRole: !!(session?.user as { role?: string })?.role,
-      role: (session?.user as { role?: string })?.role
-    })
-    
-    if (status === 'loading') {
-      console.log('AdminGuard - Still loading...')
-      return // Still loading
+    const refreshSession = async () => {
+      await getSession({ event: 'storage' })
     }
+    refreshSession()
+  }, [])
+
+  useEffect(() => {
+    if (status === 'loading') return // Still loading
 
     if (status === 'unauthenticated') {
-      console.log('AdminGuard - Unauthenticated, redirecting to login')
       router.push('/admin/login')
       return
     }
@@ -38,16 +34,13 @@ export default function AdminGuard({ children, requiredRole = 'viewer' }: AdminG
     if (status === 'authenticated') {
       // Only proceed if we have a complete session with role
       if (!session?.user?.email) {
-        console.log('AdminGuard - Session authenticated but user data not ready yet')
         return
       }
 
       const userRole = (session.user as { role?: string })?.role
-      console.log('🛡️ AdminGuard - Checking role at:', new Date().toISOString(), 'User role:', userRole, 'Required role:', requiredRole)
       
       // Wait for role to be available (not undefined, not null, not empty)
       if (!userRole || userRole === 'none') {
-        console.log('🛡️ AdminGuard - Session authenticated but role data not ready yet (role:', userRole, ') at:', new Date().toISOString())
         return
       }
       
@@ -56,14 +49,10 @@ export default function AdminGuard({ children, requiredRole = 'viewer' }: AdminG
       const userLevel = roleHierarchy[userRole as keyof typeof roleHierarchy] || 0
       const requiredLevel = roleHierarchy[requiredRole] || 0
 
-      console.log('AdminGuard - User level:', userLevel, 'Required level:', requiredLevel)
-
       if (userLevel >= requiredLevel) {
-        console.log('🛡️ AdminGuard - User authorized! at:', new Date().toISOString())
         setIsAuthorized(true)
         setIsLoading(false)
       } else {
-        console.log('🛡️ AdminGuard - User not authorized, redirecting to unauthorized at:', new Date().toISOString())
         router.push('/admin/unauthorized')
       }
     }

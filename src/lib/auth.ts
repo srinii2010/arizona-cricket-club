@@ -29,8 +29,6 @@ export const authOptions: NextAuthOptions = {
         const email = session.user.email
         if (email) {
           try {
-            console.log('🔍 Role fetch STARTED for:', email, 'at:', new Date().toISOString())
-            
             // Create Supabase client with service role key for server-side access
             const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
             const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -39,7 +37,6 @@ export const authOptions: NextAuthOptions = {
               console.warn('Supabase environment variables not configured for auth')
               // Set to 'none' when Supabase is not configured
               userRole = 'none'
-              console.log('Setting role to none due to missing Supabase config')
             } else {
               const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey)
               
@@ -50,18 +47,13 @@ export const authOptions: NextAuthOptions = {
                 .single()
               
               if (error || !userData) {
-                console.log('User not found in database:', email, error?.message)
                 // If no database record, set to 'none' (no access)
                 userRole = 'none'
-                console.log('No database record, setting role to none')
               } else {
                 // Use database role
                 userRole = userData.role || 'none'
-                console.log('User role found in database:', email, '->', userRole)
               }
             }
-            
-            console.log('✅ Role fetch COMPLETED for:', email, 'role:', userRole, 'at:', new Date().toISOString())
           } catch (error) {
             console.error('Error fetching user role from database:', error)
             // On error, set to 'none' for security
