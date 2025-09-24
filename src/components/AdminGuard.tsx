@@ -16,7 +16,7 @@ export default function AdminGuard({ children, requiredRole = 'viewer' }: AdminG
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    console.log('AdminGuard - Session changed:', { 
+    console.log('🛡️ AdminGuard - Session changed at:', new Date().toISOString(), { 
       status, 
       hasUser: !!session?.user, 
       hasEmail: !!session?.user?.email,
@@ -43,11 +43,11 @@ export default function AdminGuard({ children, requiredRole = 'viewer' }: AdminG
       }
 
       const userRole = (session.user as { role?: string })?.role
-      console.log('AdminGuard - User role:', userRole, 'Required role:', requiredRole)
+      console.log('🛡️ AdminGuard - Checking role at:', new Date().toISOString(), 'User role:', userRole, 'Required role:', requiredRole)
       
       // Wait for role to be available (not undefined, not null, not empty)
       if (!userRole || userRole === 'none') {
-        console.log('AdminGuard - Session authenticated but role data not ready yet (role:', userRole, ')')
+        console.log('🛡️ AdminGuard - Session authenticated but role data not ready yet (role:', userRole, ') at:', new Date().toISOString())
         return
       }
       
@@ -59,11 +59,11 @@ export default function AdminGuard({ children, requiredRole = 'viewer' }: AdminG
       console.log('AdminGuard - User level:', userLevel, 'Required level:', requiredLevel)
 
       if (userLevel >= requiredLevel) {
-        console.log('AdminGuard - User authorized!')
+        console.log('🛡️ AdminGuard - User authorized! at:', new Date().toISOString())
         setIsAuthorized(true)
         setIsLoading(false)
       } else {
-        console.log('AdminGuard - User not authorized, redirecting to unauthorized')
+        console.log('🛡️ AdminGuard - User not authorized, redirecting to unauthorized at:', new Date().toISOString())
         router.push('/admin/unauthorized')
       }
     }
