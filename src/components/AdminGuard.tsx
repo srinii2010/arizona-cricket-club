@@ -14,7 +14,6 @@ export default function AdminGuard({ children, requiredRole = 'viewer' }: AdminG
   const router = useRouter()
   const [isAuthorized, setIsAuthorized] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  const [retryCount, setRetryCount] = useState(0)
 
   useEffect(() => {
     if (status === 'loading') return // Still loading
@@ -30,18 +29,15 @@ export default function AdminGuard({ children, requiredRole = 'viewer' }: AdminG
       return
     }
 
+    // Wait for session to be fully established with role data
+    if (status === 'authenticated' && session?.user?.email && !(session.user as { role?: string })?.role) {
+      console.log('AdminGuard - Session authenticated but role data not ready yet')
+      return
+    }
+
     if (session?.user?.email) {
       const userRole = (session.user as { role?: string })?.role
-      console.log('AdminGuard - User role:', userRole, 'Required role:', requiredRole, 'Retry count:', retryCount)
-      
-      // If no role yet, retry a few times
-      if (!userRole && retryCount < 3) {
-        console.log('AdminGuard - No role found, retrying...')
-        setTimeout(() => {
-          setRetryCount(prev => prev + 1)
-        }, 1000)
-        return
-      }
+      console.log('AdminGuard - User role:', userRole, 'Required role:', requiredRole)
       
       // Check if user has required role
       const roleHierarchy = { viewer: 1, editor: 2, admin: 3 }
@@ -61,7 +57,7 @@ export default function AdminGuard({ children, requiredRole = 'viewer' }: AdminG
     } else {
       setIsLoading(false)
     }
-  }, [session, status, requiredRole, router, retryCount])
+  }, [session, status, requiredRole, router])
 
   if (isLoading) {
     let loadingMessage = "Loading..."
@@ -70,7 +66,7 @@ export default function AdminGuard({ children, requiredRole = 'viewer' }: AdminG
       loadingMessage = "Connecting to Google..."
     } else if (status === 'authenticated' && !session?.user?.email) {
       loadingMessage = "Verifying your account..."
-    } else if (status === 'authenticated' && session?.user?.email && retryCount > 0) {
+    } else if (status === 'authenticated' && session?.user?.email && !(session.user as { role?: string })?.role) {
       loadingMessage = "Loading your admin permissions..."
     }
     
