@@ -1,6 +1,6 @@
 'use client'
 
-import { useSession, getSession } from 'next-auth/react'
+import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
@@ -14,14 +14,6 @@ export default function AdminGuard({ children, requiredRole = 'viewer' }: AdminG
   const router = useRouter()
   const [isAuthorized, setIsAuthorized] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-
-  // Force session refresh to bypass Vercel caching
-  useEffect(() => {
-    const refreshSession = async () => {
-      await getSession({ event: 'storage' })
-    }
-    refreshSession()
-  }, [])
 
   useEffect(() => {
     if (status === 'loading') return // Still loading
