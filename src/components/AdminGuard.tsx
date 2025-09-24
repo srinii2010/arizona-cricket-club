@@ -16,7 +16,13 @@ export default function AdminGuard({ children, requiredRole = 'viewer' }: AdminG
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    console.log('AdminGuard - Session changed:', { status, session: session?.user })
+    console.log('AdminGuard - Session changed:', { 
+      status, 
+      hasUser: !!session?.user, 
+      hasEmail: !!session?.user?.email,
+      hasRole: !!(session?.user as { role?: string })?.role,
+      role: (session?.user as { role?: string })?.role
+    })
     
     if (status === 'loading') {
       console.log('AdminGuard - Still loading...')
@@ -30,9 +36,7 @@ export default function AdminGuard({ children, requiredRole = 'viewer' }: AdminG
     }
 
     if (status === 'authenticated') {
-      // Reset authorization state when session changes
-      setIsAuthorized(false)
-      
+      // Only proceed if we have a complete session with role
       if (!session?.user?.email) {
         console.log('AdminGuard - Session authenticated but user data not ready yet')
         return
@@ -41,8 +45,9 @@ export default function AdminGuard({ children, requiredRole = 'viewer' }: AdminG
       const userRole = (session.user as { role?: string })?.role
       console.log('AdminGuard - User role:', userRole, 'Required role:', requiredRole)
       
-      if (!userRole) {
-        console.log('AdminGuard - Session authenticated but role data not ready yet')
+      // Wait for role to be available (not undefined, not null, not empty)
+      if (!userRole || userRole === 'none') {
+        console.log('AdminGuard - Session authenticated but role data not ready yet (role:', userRole, ')')
         return
       }
       
