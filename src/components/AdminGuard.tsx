@@ -14,6 +14,7 @@ export default function AdminGuard({ children, requiredRole = 'viewer' }: AdminG
   const router = useRouter()
   const [isAuthorized, setIsAuthorized] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [retryCount, setRetryCount] = useState(0)
 
   useEffect(() => {
     if (status === 'loading') return // Still loading
@@ -23,9 +24,24 @@ export default function AdminGuard({ children, requiredRole = 'viewer' }: AdminG
       return
     }
 
-    if (session?.user) {
+    // Wait for session to be fully established with user data
+    if (status === 'authenticated' && !session?.user?.email) {
+      console.log('AdminGuard - Session authenticated but user data not ready yet')
+      return
+    }
+
+    if (session?.user?.email) {
       const userRole = (session.user as { role?: string })?.role
-      console.log('AdminGuard - User role:', userRole, 'Required role:', requiredRole)
+      console.log('AdminGuard - User role:', userRole, 'Required role:', requiredRole, 'Retry count:', retryCount)
+      
+      // If no role yet, retry a few times
+      if (!userRole && retryCount < 3) {
+        console.log('AdminGuard - No role found, retrying...')
+        setTimeout(() => {
+          setRetryCount(prev => prev + 1)
+        }, 1000)
+        return
+      }
       
       // Check if user has required role
       const roleHierarchy = { viewer: 1, editor: 2, admin: 3 }
@@ -45,14 +61,24 @@ export default function AdminGuard({ children, requiredRole = 'viewer' }: AdminG
     } else {
       setIsLoading(false)
     }
-  }, [session, status, requiredRole, router])
+  }, [session, status, requiredRole, router, retryCount])
 
   if (isLoading) {
+    let loadingMessage = "Loading..."
+    
+    if (status === 'loading') {
+      loadingMessage = "Connecting to Google..."
+    } else if (status === 'authenticated' && !session?.user?.email) {
+      loadingMessage = "Verifying your account..."
+    } else if (status === 'authenticated' && session?.user?.email && retryCount > 0) {
+      loadingMessage = "Loading your admin permissions..."
+    }
+    
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+          <p className="mt-4 text-gray-600">{loadingMessage}</p>
         </div>
       </div>
     )

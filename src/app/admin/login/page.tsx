@@ -51,19 +51,31 @@ export default function AdminLogin() {
       } else if (result?.ok) {
         console.log('Sign in successful, checking session...')
         
-        // Wait a moment for the session to be established
+        // Wait longer for the session to be established
         setTimeout(async () => {
           const session = await getSession()
           console.log('Session after sign in:', session)
           
-          if (session) {
-            console.log('Session found, redirecting to admin')
+          if (session?.user?.email) {
+            console.log('Session found with user data, redirecting to admin')
             router.push('/admin')
           } else {
-            console.log('No session found after sign in')
-            setError('Sign in successful but session not established. Please try again.')
+            console.log('Session not fully established, retrying...')
+            // Retry once more after another delay
+            setTimeout(async () => {
+              const retrySession = await getSession()
+              console.log('Retry session:', retrySession)
+              
+              if (retrySession?.user?.email) {
+                console.log('Session established on retry, redirecting to admin')
+                router.push('/admin')
+              } else {
+                console.log('Session still not established after retry')
+                setError('Sign in successful but session not established. Please try again.')
+              }
+            }, 1500)
           }
-        }, 1000)
+        }, 1500)
       }
     } catch (error) {
       console.error('Sign in error:', error)
