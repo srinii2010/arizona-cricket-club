@@ -397,13 +397,19 @@ export default function NewGeneralExpensePage() {
                 className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500 sm:text-sm"
               >
                 <option value="">All Formats (General Expense)</option>
-                {tournamentFormats
-                  .filter(format => format.seasons.year === parseInt(formData.year.toString()))
-                  .map((format) => (
-                    <option key={format.id} value={format.id}>
-                      {format.name} ({format.seasons.year})
-                    </option>
-                  ))}
+{tournamentFormats
+  .filter((format) => {
+    const yearValue = Number.parseInt((formData.year || '').toString(), 10);
+    const formatYear = format?.seasons?.year;
+    if (!Number.isFinite(yearValue)) return false;
+    if (typeof formatYear !== 'number') return false;
+    return formatYear === yearValue;
+  })
+  .map((format) => (
+    <option key={format.id} value={format.id}>
+      {format.name} ({format.seasons?.year ?? '—'})
+    </option>
+  ))}
               </select>
               {selectedFormat && (
                 <div className="mt-2 p-3 bg-gray-50 rounded-md">
