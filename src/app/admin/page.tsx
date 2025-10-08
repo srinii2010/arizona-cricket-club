@@ -3,7 +3,7 @@
 import { useSession } from 'next-auth/react'
 import { signOut } from 'next-auth/react'
 import Link from 'next/link'
-import { Users, DollarSign, Calendar, Settings, LogOut, Trophy, Eye, Edit, Shield, Clock } from 'lucide-react'
+import { Users, DollarSign, Calendar, Settings, LogOut, Trophy, Eye, Edit, Shield, Clock, Bell } from 'lucide-react'
 import { getUserPermissions, UserRole } from '@/lib/permissions'
 import AdminGuard from '@/components/AdminGuard'
 
@@ -183,6 +183,21 @@ export default function AdminDashboard() {
               </div>
             </Link>
           )}
+
+{/* Notifications */}
+{permissions.canManageAccess && (
+  <Link href="/admin/notifications" className="group">
+    <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+      <div className="flex items-center">
+        <Bell className="h-8 w-8 text-green-600" />
+        <h3 className="ml-3 text-lg font-medium text-gray-900">Notifications</h3>
+      </div>
+      <p className="mt-2 text-sm text-gray-600">
+        Send dues reminders and daily reports.
+      </p>
+    </div>
+  </Link>
+)}
         </div>
 
         {/* Show message if user has no permissions */}
