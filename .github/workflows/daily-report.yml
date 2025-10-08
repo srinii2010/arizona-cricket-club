@@ -1,0 +1,16 @@
+name: Daily Report
+on:
+  schedule:
+    - cron: '0 8 * * *'  # 1 AM Phoenix time
+    - cron: '*/5 * * * *'  # Every 5 minutes for testing
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  send-report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Daily Report
+        run: |
+          curl -X POST \
+            -H "x-cron-secret: ${{ secrets.CRON_SECRET }}" \
+            https://arizona-cricket-club.vercel.app/api/notifications/daily-report
