@@ -91,17 +91,23 @@ export const authOptions: NextAuthOptions = {
       // Allow all users to sign in, but check authorization in session callback
       return true
     },
-    async redirect({ url, baseUrl }) {
-      console.log('Redirect callback:', { url, baseUrl })
-      
-      // If URL is provided, use it (this respects callbackUrl from signOut)
-      if (url) {
-        return url
-      }
-      
-      // Default to admin for login
-      return `${baseUrl}/admin`
-    }
+async redirect({ url, baseUrl }) {
+  console.log('Redirect callback:', { url, baseUrl })
+
+  // If redirecting to admin after auth, add small delay to let session callback complete
+  if (url && url.includes('/admin') && !url.includes('/admin/login')) {
+    // Let the session callback finish setting the role
+    await new Promise(resolve => setTimeout(resolve, 100))
+  }
+
+  // If URL is provided, use it (this respects callbackUrl from signOut)
+  if (url) {
+    return url
+  }
+
+  // Default to admin for login
+  return `${baseUrl}/admin`
+}
   },
   pages: {
     signIn: '/admin/login',
