@@ -11,6 +11,8 @@ jobs:
     steps:
       - name: Send Daily Report
         run: |
-          curl -X POST \
+          echo "Sending request to daily report endpoint..."
+          curl -v -X POST \
             -H "x-cron-secret: ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json" \
             https://arizona-cricket-club.vercel.app/api/notifications/daily-report
