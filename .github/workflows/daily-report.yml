@@ -1,0 +1,15 @@
+name: Daily Report
+on:
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  send-report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Daily Report
+        run: |
+          echo "Sending request to daily report endpoint..."
+          curl -v -X POST \
+            -H "x-cron-secret: ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json" \
+            https://arizona-cricket-club.vercel.app/api/notifications/daily-report
