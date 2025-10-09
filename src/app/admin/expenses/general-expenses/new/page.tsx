@@ -39,6 +39,7 @@ const categories = [
   'LiveStream',
   'Mat',
   'Food',
+  'PitchPrep',
   'Others'
 ];
 
