@@ -1,6 +1,5 @@
 name: Daily Report
 on:
-  schedule:
   workflow_dispatch:  # Allow manual trigger
 
 jobs:
