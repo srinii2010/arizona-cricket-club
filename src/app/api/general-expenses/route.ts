@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate category
-    const validCategories = ['Umpire', 'Equipment', 'Storage', 'LiveStream', 'Mat', 'Food', 'Others'];
+    const validCategories = ['Umpire', 'Equipment', 'Storage', 'LiveStream', 'Mat', 'Food', 'PitchPrep', 'Others'];
     if (!validCategories.includes(category)) {
       return NextResponse.json({ error: 'Invalid category' }, { status: 400 });
     }
