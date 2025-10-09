@@ -45,6 +45,7 @@ export default function GeneralExpensesPage() {
     'LiveStream',
     'Mat',
     'Food',
+    'PitchPrep',
     'Others'
   ];
 
