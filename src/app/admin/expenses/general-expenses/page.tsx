@@ -137,6 +137,7 @@ export default function GeneralExpensesPage() {
       'LiveStream': 'bg-pink-100 text-pink-800',
       'Mat': 'bg-indigo-100 text-indigo-800',
       'Food': 'bg-orange-100 text-orange-800',
+      'PitchPrep': 'bg-orange-100 text-orange-800',
       'Others': 'bg-gray-100 text-gray-800'
     };
     return colors[category] || 'bg-gray-100 text-gray-800';
